@@ -357,13 +357,14 @@ if(canvas) {
     scene.add(particlesMesh);
 
     lenis.on('scroll', (e) => {
-        const progress = Math.min(e.scroll / (window.innerHeight * 0.6), 1); 
+        // Math.max(0, ...) : 모바일에서 오버스크롤(바운스)시 e.scroll이 음수가 되면
+        // Math.pow(음수, 0.5) = NaN이 되어 구가 사라지는 버그 방지
+        const clampedScroll = Math.max(0, e.scroll);
+        const progress = Math.min(clampedScroll / (window.innerHeight * 0.6), 1); 
         const scaleFactor = 1 + (progress * 1.5); 
         particlesMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
         
         mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(progress, 0.5));
-        // visible을 false로 만들지 않음 - 모바일에서 스크롤을 올렸을 때 구가 안 보이는 버그 방지
-        // 대신 opacity가 0에 가까워지면 자연스럽게 안 보이게 됨
     });
 
     // --- 깔끔하고 통일성 있는 배경: Cinematic Ambient Gaussian Dust (Bokeh Effect) ---

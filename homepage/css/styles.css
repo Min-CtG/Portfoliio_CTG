@@ -581,13 +581,15 @@ footer {
     font-family: var(--font-tech);
     font-size: 1.2rem;
     color: var(--text-muted);
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
     text-decoration: none;
     letter-spacing: 2px;
     display: inline-block;
+    transform-origin: left center;
 }
 .sidebar-links li a:hover, .sidebar-links li a.active {
     color: var(--text-color);
+    transform: scale(1.1);
 }
 .sidebar-links .btn-contact {
     margin-top: 1rem;
