@@ -1,112 +1,10 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exhibition | 3D Gaussian Splatting</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400..800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
-</head>
-<body class="artworks-page">
-    <!-- Navigation -->
-        <nav class="nav-glass" style="justify-content: flex-start; gap: 1.5rem;">
-        <div class="menu-btn" onclick="toggleSidebar()">
-            <div class="h-line"></div>
-            <div class="h-line"></div>
-            <div class="h-line"></div>
-        </div>
-        <div class="logo"><a href="index.html">CreatorTheGaphi<span>.</span></a></div>
-    </nav>
+import re
 
-    <!-- Sidebar Overlay -->
-    <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-    
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar" data-lenis-prevent>
-        <div class="sidebar-header">
-            <button class="close-btn" onclick="toggleSidebar()">&times;</button>
-        </div>
-        <ul class="sidebar-links">
-            <li><a href="index.html#vision" onclick="toggleSidebar()">Vision</a></li>
-            <li><a href="exhibition.html">Exhibition</a></li>
-            <li><a href="artworks.html">Artworks</a></li>
-            <li><a href="index.html#commission" onclick="toggleSidebar()">Commission</a></li>
-        </ul>
-    </div>
+with open('artworks.html', 'r', encoding='utf-8') as f:
+    html = f.read()
 
-    <!-- ???硫?????諛곌꼍 罹붾쾭??異? (?????援? ???癒?媛 ????怨? -->
-    <canvas id="bg-canvas"></canvas>
-
-    <div class="exhibition-hero" style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-        <h1 class="reveal-text">THE ARTWORKS</h1>
-        <p class="reveal-text" style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px; margin: 1rem auto; text-align: center;">
-            A collection of traditional and digital paintings exploring color, form, and emotion.
-        </p>
-
-        <!-- Scroll Indicator -->
-        <div class="scroll-indicator" style="position: absolute; bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0.6; animation: fadeBob 2s infinite;">
-            <span style="font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;">Scroll Down</span>
-            <div style="width: 1px; height: 40px; background: currentColor;"></div>
-        </div>
-    </div>
-
-            <!-- Back to Categories Button (Hidden by default) -->
-        <div id="category-back-btn" style="display: none; width: 100%; max-width: 1400px; margin: 0 auto 2rem auto; padding: 0 4rem;">
-        <button onclick="showCategories()" class="btn-primary" style="background: transparent; border: 1px solid var(--primary-color); padding: 0.8rem 1.5rem; font-size: 0.9rem; margin: 0;">&larr; BACK TO CATEGORIES</button>
-        <h2 id="current-category-title" style="margin-top: 1.5rem; color: var(--text-color); font-family: var(--font-tech); font-weight: 300; letter-spacing: 2px;">CATEGORY</h2>
-    </div>
-
-    <div id="dynamic-content-area"></div>
-
-    <!-- Modal Backdrop -->
-    <div id="modal-backdrop" class="modal-backdrop" onclick="closeProject()"></div>
-
-    <!-- Bottom Drawer Project Modal -->
-    <div id="project-modal" class="project-modal" data-lenis-prevent>
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeProject()">&times;</button>
-            <div class="text-block" style="text-align: center; margin-bottom: 4rem;">
-                <h2 id="modal-subtitle" class="section-subtitle">2024</h2>
-                <h3 id="modal-title" class="section-title">Artwork Title</h3>
-                
-                <div style="margin: 1.5rem auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center;">
-                    <!-- ?湲??????????吏??????-->
-                    <img id="modal-image" src="" alt="Artwork" style="width: 100%; max-height: 45vh; object-fit: contain; display: none; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));">
-                    <span id="modal-img-placeholder" style="padding: 4rem; color: #555;">[ Full Resolution Image Here ]</span>
-                </div>
-                
-                <p id="modal-desc" style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.8; max-width: 800px; margin: 0 auto;">
-                    Artwork description goes here.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    
-    <!-- Back to Main Button -->
-    <div class="back-to-main" style="display: flex; flex-direction: column; align-items: center; padding: 5rem 0 10rem 0; position: relative; z-index: 10;">
-        <div style="width: 1px; height: 150px; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.7)); margin-bottom: 2rem;"></div>
-        <a href="index.html" class="btn-primary" style="background: transparent; border: 1px solid var(--primary-color);">BACK TO MAIN</a>
-    </div>
-    
-    <footer>
-        <p>&copy; 2026 CreatorTheGaphi. All rights reserved.</p>
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
-    <!-- ???CORS) 諛????蹂???議곌컖??????-->
-    <script src="data/faceData.js"></script>
-    <script src="data/lucyData.js"></script>
-    <script src="js/script.js"></script>
-    <script src="data/artworksData.js"></script>
-    <script>
-
+# Replace the entire script block
+new_script = '''
         // Auto-generate portfolio deck categories
         let currentWorks = [];
         
@@ -138,9 +36,7 @@
                     </div>`;
                 });
                 htmlStr += '</section>';
-                container.style.opacity = 0;
-            container.innerHTML = htmlStr;
-            gsap.to(container, { opacity: 1, duration: 1.0, ease: "power2.out" });
+                container.innerHTML = htmlStr;
             }
         }
 
@@ -172,7 +68,7 @@
             if (cat.id === "APHANTASIA") {
                 const desc1 = "이 작품은 시각적 상상력이 부재한 상태를 뜻하는 아판타시아 증후군과 고대 조각상의 구조적 본질을 결합하여 새로운 해석을 시도한 작업이다. 아판타시아를 겪는 사람들은 머릿속으로 이미지를 시각화하지 못하지만, 이는 오히려 형태와 본질에 대한 독창적인 접근을 가능하게 한다는 점에서 예술적 가능성을 발견할 수 있다.<br><br>고대 조각상의 견고한 형상과 아판타시아의 비물질적 특성은 상반되면서도 조화를 이루며, 이를 통해 시각 예술의 새로운 해석을 탐구했다.<br>작품에서는 고대 조각상의 완전함에 흐릿하거나 추상적인 요소를 더해 '형태를 상상하지 못하는 상상력'이라는 역설적 개념을 시각적으로 구현했다.<br><br>이 작품은 단순한 시각적 아름다움을 넘어 인간의 인지적 다양성과 심리적 경험을 철학적으로 탐구하는 의의를 지닌다.<br>고대 미술의 정형성을 현대적이고 추상적인 디자인 기법으로 재해석함으로써, 보이지 않는 이미지를 시각적으로 구현하는 독창적인 시도를 통해 시각디자인의 융합 가능성을 제시했다.";
                 
-                const desc2 = "아판타시아 증후군은 머릿속에서 이미지를 상상하기 어려운 상태를 뜻하지만, 창의성은 단순히 시각적 상상력에만 의존하지 않는다. 창의성은 문제를 해결하고 새로운 관점을 제시하며 독창적인 아이디어를 만들어내는 능력이다. 당신은 단순히 눈에 보이는 것뿐 아니라 감각, 경험, 논리, 그리고 독특한 사고 과정을 통해 창의성을 발휘할 수 있다. 시각적 이미지를 떠올리지 못한다고 해서 당신의 상상력이 부족하다고 생각하지 말라. 오히려 당신의 특별한 사고 방식이 세상에 새로운 영감을 줄 가능성이 크다.<br><br>아판타시아를 가진 수많은 사람들이 음악, 문학, 과학, 기술 등 다양한 분야에서 큰 업적을 이뤘다. 당신의 강점은 자신만의 독창적인 방식으로 세상을 바라보고, 표현하고, 창조하는 데 있다.<br><br><strong>&quot;상상이 아닌, 창조로 말하라.&quot;</strong><br>당신의 이야기와 아이디어는 그 자체로 충분히 특별하다.";
+                const desc2 = "아판타시아 증후군은 머릿속에서<br>이미지를 상상하기 어려운 상태를<br>뜻하지만, 창의성은 단순히 시각적<br>상상력에만 의존하지 않는다.<br>창의성은 문제를 해결하고 새로운<br>관점을 제시하며 독창적인<br>아이디어를 만들어내는 능력이다.<br>당신은 단순히 눈에 보이는 것뿐<br>아니라 감각, 경험, 논리, 그리고<br>독특한 사고 과정을 통해 창의성을<br>발휘할 수 있다. 시각적 이미지를<br>떠올리지 못한다고 해서 당신의<br>상상력이 부족하다고 생각하지<br>말라. 오히려 당신의 특별한 사고<br>방식이 세상에 새로운 영감을 줄<br>가능성이 크다.<br><br>아판타시아를 가진 수많은 사람들이<br>음악, 문학, 과학, 기술 등 다양한<br>분야에서 큰 업적을 이뤘다. 당신의<br>강점은 자신만의 독창적인 방식으로<br>세상을 바라보고, 표현하고,<br>창조하는 데 있다<br><br><strong>&quot;상상이 아닌, 창조로 말하라.&quot;</strong><br>당신의 이야기와 아이디어는 그<br>자체로 충분히 특별하다.";
 
                 const posters = cat.works.filter(w => w.is_poster);
                 const others = cat.works.filter(w => !w.is_poster);
@@ -225,9 +121,7 @@
                 htmlStr += '</section>';
             }
             
-            container.style.opacity = 0;
             container.innerHTML = htmlStr;
-            gsap.to(container, { opacity: 1, duration: 1.0, ease: "power2.out" });
         }
 
         const modal = document.getElementById('project-modal');
@@ -267,27 +161,10 @@
             document.body.style.overflow = 'auto';
             if (window.lenis) window.lenis.start();
         }
+'''
 
-</script>
-    <!-- FreeFrontend Liquid Glass Chromatic Filter (OPTIMIZED FOR 1660 SUPER) -->
-    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
-        <defs>
-            <filter id="glass-filter">
-                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="1" result="noise"></feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" result="disp"></feDisplacementMap>
-                <feGaussianBlur in="disp" stdDeviation="2"></feGaussianBlur>
-            </filter>
-        </defs>
-    </svg>
-</body>
-</html>
+# Use regex to replace EVERYTHING inside <script>...</script> at the bottom of artworks.html
+html = re.sub(r'<script>\s*// Auto-generate portfolio deck categories.*?</script>', f'<script>\n{new_script}\n</script>', html, flags=re.DOTALL)
 
-
-
-
-
-
-
-
-
-
+with open('artworks.html', 'w', encoding='utf-8') as f:
+    f.write(html)

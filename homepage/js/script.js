@@ -1,4 +1,4 @@
-// --- Lenis Smooth Scrolling Setup ---
+﻿// --- Lenis Smooth Scrolling Setup ---
 const lenis = new Lenis({
     duration: 1.0, 
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -97,7 +97,10 @@ document.addEventListener('mousemove', (event) => {
 
 // --- Three.js Main Background (Geometric Sphere) ---
 const canvas = document.getElementById('bg-canvas');
-let mainParticlesMaterial; 
+let mainParticlesMaterial;
+let scrollProgress = 0;
+window.glassDimmer = 1.0;
+window.miniMaterials = []; 
 
 // 3DGS(가우시안 스플래팅) 느낌을 내기 위한 부드러운 가우시안 텍스처(타원체/Splat) 생성기
 function createSplatTexture() {
@@ -197,18 +200,15 @@ if(canvas) {
                     offsets[3] = vec2(-1.0,  0.0); offsets[4] = vec2(0.0,  0.0); offsets[5] = vec2(1.0,  0.0);
                     offsets[6] = vec2(-1.0,  1.0); offsets[7] = vec2(0.0,  1.0); offsets[8] = vec2(1.0,  1.0);
                     
+                    vec4 color = vec4(0.0);
                     for(int i = 0; i < 9; i++) {
                         vec2 offset = offsets[i] * blurSize;
-                        color.r += texture2D(tDiffuse, uvR + offset).r;
-                        color.g += texture2D(tDiffuse, uvG + offset).g;
-                        color.b += texture2D(tDiffuse, uvB + offset).b;
+                        color += texture2D(tDiffuse, vUv + offset);
                     }
                     color /= 9.0;
                     
-                    // 유리 뒤의 파티클이 너무 밝아지지 않도록 밝기를 억제하고, 어두운 틴트를 강하게 적용
-                    color.rgb = mix(color.rgb, vec3(0.03, 0.04, 0.08), 0.7);
-                    
-                    gl_FragColor = vec4(color.rgb, 1.0);
+                    color.rgb = mix(color.rgb, vec3(0.01, 0.02, 0.04), 0.85); // 어둡게
+                    gl_FragColor = color;
                 } else {
                     gl_FragColor = texture2D(tDiffuse, vUv);
                 }
@@ -219,7 +219,8 @@ if(canvas) {
     const postMaterial = new THREE.ShaderMaterial({
         uniforms: glassShader.uniforms,
         vertexShader: glassShader.vertexShader,
-        fragmentShader: glassShader.fragmentShader
+        fragmentShader: glassShader.fragmentShader,
+        transparent: true // WebGLRenderTarget의 투명도를 화면에 그대로 전달
     });
     const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial);
     postScene.add(postQuad);
@@ -360,15 +361,16 @@ if(canvas) {
     window.particlesMesh = particlesMesh;
     window.mainParticlesMaterial = mainParticlesMaterial;
     
+    window.modelFade = 1.0;
     window.toggle3DModel = function(show) {
         if (window.particlesMesh && window.mainParticlesMaterial) {
             if (show) {
-                gsap.killTweensOf(window.mainParticlesMaterial);
+                gsap.killTweensOf(window);
                 window.particlesMesh.visible = true;
-                gsap.to(window.mainParticlesMaterial, { opacity: 0.8, duration: 1.0 });
+                gsap.to(window, { modelFade: 1.0, duration: 1.0 });
             } else {
-                gsap.killTweensOf(window.mainParticlesMaterial);
-                gsap.to(window.mainParticlesMaterial, { opacity: 0, duration: 0.8, onComplete: () => {
+                gsap.killTweensOf(window);
+                gsap.to(window, { modelFade: 0.0, duration: 1.0, onComplete: () => {
                     window.particlesMesh.visible = false;
                 }});
             }
@@ -383,9 +385,7 @@ if(canvas) {
         const scaleFactor = 1 + (progress * 1.5); 
         particlesMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
         
-        if (particlesMesh.visible) {
-            mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(progress, 0.5));
-        }
+        
     });
 
     // --- 깔끔하고 통일성 있는 배경: Cinematic Ambient Gaussian Dust (Bokeh Effect) ---
@@ -492,7 +492,21 @@ if(canvas) {
         const modal = document.querySelector('.project-modal');
         const modalActive = modal && modal.classList.contains('active');
         
+        
         const needGlass = sidebarActive || modalActive;
+        
+        window.glassDimmer += ((needGlass ? 0.15 : 1.0) - window.glassDimmer) * 0.1;
+        
+        if (window.particlesMesh && window.particlesMesh.visible && mainParticlesMaterial) {
+            mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(scrollProgress, 0.5)) * window.glassDimmer * (window.modelFade !== undefined ? window.modelFade : 1.0);
+        }
+        
+        if (window.miniMaterials) {
+            window.miniMaterials.forEach(m => {
+                m.opacity = 0.8 * window.glassDimmer;
+            });
+        }
+
         
         if (needGlass) {
             // 유리 효과 ON: 2-pass 렌더링
@@ -831,5 +845,7 @@ window.toggleSidebar = function() {
         overlay.classList.toggle('active');
     }
 };
+
+
 
 
