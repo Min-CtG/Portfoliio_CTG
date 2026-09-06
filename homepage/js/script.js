@@ -1,4 +1,4 @@
-﻿// --- Lenis Smooth Scrolling Setup ---
+// --- Lenis Smooth Scrolling Setup ---
 const lenis = new Lenis({
     duration: 1.0, 
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -381,11 +381,12 @@ if(canvas) {
         // Math.max(0, ...) : 모바일에서 오버스크롤(바운스)시 e.scroll이 음수가 되면
         // Math.pow(음수, 0.5) = NaN이 되어 구가 사라지는 버그 방지
         const clampedScroll = Math.max(0, e.scroll);
-        const progress = Math.min(clampedScroll / (window.innerHeight * 0.6), 1); 
-        const scaleFactor = 1 + (progress * 1.5); 
+        const progress = Math.min(clampedScroll / (window.innerHeight * 0.65), 1); 
+        scrollProgress = progress;
+        
+        // 스크롤 시 화면 밖으로 시원하게 쫘아악 퍼지도록 스케일 증가 (1.0 -> 3.5배)
+        const scaleFactor = 1 + (progress * 2.5); 
         particlesMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
-        
-        
     });
 
     // --- 깔끔하고 통일성 있는 배경: Cinematic Ambient Gaussian Dust (Bokeh Effect) ---
@@ -497,8 +498,10 @@ if(canvas) {
         
         window.glassDimmer += ((needGlass ? 0.15 : 1.0) - window.glassDimmer) * 0.1;
         
-        if (window.particlesMesh && window.particlesMesh.visible && mainParticlesMaterial) {
-            mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(scrollProgress, 0.5)) * window.glassDimmer * (window.modelFade !== undefined ? window.modelFade : 1.0);
+        if (window.particlesMesh && mainParticlesMaterial) {
+            const scrollFade = Math.max(0, 1 - Math.pow(scrollProgress, 0.5));
+            const fade = window.modelFade !== undefined ? window.modelFade : 1.0;
+            mainParticlesMaterial.opacity = 0.8 * scrollFade * window.glassDimmer * fade;
         }
         
         if (window.miniMaterials) {
