@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,7 +29,7 @@
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar" data-lenis-prevent>
         <div class="sidebar-header">
-            <button class="close-btn" onclick="toggleSidebar()">×</button>
+            <button class="close-btn" onclick="toggleSidebar()">횞</button>
         </div>
         <ul class="sidebar-links">
             <li><a href="index.html#vision" onclick="toggleSidebar()">Vision</a></li>
@@ -39,7 +39,7 @@
         </ul>
     </div>
 
-    <!-- ???�?????배경 캔버??�? (?????�? ???�?가 ????�? -->
+    <!-- ???硫?????諛곌꼍 罹붾쾭??異? (?????援? ???癒?媛 ????怨? -->
     <canvas id="bg-canvas"></canvas>
 
     <div class="exhibition-hero" style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
@@ -56,128 +56,8 @@
     </div>
 
     <!-- Painting Grid (Card Deck Style) -->
-    <section class="portfolio-deck">
-        <div class="portfolio-card" onclick="openProject('art_proserpina')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/The Rape of Proserpina_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>The Rape of Proserpina</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_aeneas')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/aeneas anchises and ascanius_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Aeneas Anchises and Ascanius</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_victory')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/angel with victory_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Angel with Victory</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_angel_08')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/angel_08-02_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Angel 08-02</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_anghel_02')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/anghel_02_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Anghel 02</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_pieta')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/pieta_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Pieta</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_bronze')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/the age of bronze_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>The Age of Bronze</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k1')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_01_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 01</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k2')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_02_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 02</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k3')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_03_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 03</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k4')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_04_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 04</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k5')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_05_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 05</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k7')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_07_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 07</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k8')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_08_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork 08</h3>
-            </div>
-        </div>
-        <div class="portfolio-card" onclick="openProject('art_k_cover')">
-            <div class="card-image-placeholder" style="background: url('assets/ARTWORKS/images/KakaoTalk_20260831_123725447_thumb.webp') center/cover; position: relative;">
-            </div>
-            <div class="card-info" style="padding: 1.5rem;">
-                <p>2026</p>
-                <h3>Artwork Collection</h3>
-            </div>
-        </div>
-
+    <section class="portfolio-deck" id="dynamic-portfolio-deck">
+        <!-- Images will be injected here automatically by JavaScript -->
     </section>
 
     <!-- Modal Backdrop -->
@@ -186,13 +66,13 @@
     <!-- Bottom Drawer Project Modal -->
     <div id="project-modal" class="project-modal" data-lenis-prevent>
         <div class="modal-content">
-            <button class="modal-close" onclick="closeProject()">×</button>
+            <button class="modal-close" onclick="closeProject()">횞</button>
             <div class="text-block" style="text-align: center; margin-bottom: 4rem;">
                 <h2 id="modal-subtitle" class="section-subtitle">2024</h2>
                 <h3 id="modal-title" class="section-title">Artwork Title</h3>
                 
                 <div style="margin: 1.5rem auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center;">
-                    <!-- ?�??????????지??????-->
+                    <!-- ?湲??????????吏??????-->
                     <img id="modal-image" src="" alt="Artwork" style="width: 100%; max-height: 45vh; object-fit: contain; display: none; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));">
                     <span id="modal-img-placeholder" style="padding: 4rem; color: #555;">[ Full Resolution Image Here ]</span>
                 </div>
@@ -217,105 +97,33 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
-    <!-- ???CORS) �????변???조각??????-->
+    <!-- ???CORS) 諛????蹂???議곌컖??????-->
     <script src="data/faceData.js"></script>
     <script src="data/lucyData.js"></script>
     <script src="js/script.js"></script>
+    <script src="data/artworksData.js"></script>
     <script>
-        // Artwork Data
-        const artworks = {
-        'art_proserpina': {
-            sub: '2026',
-            title: 'The Rape of Proserpina',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/The Rape of Proserpina_full.webp'
-        },
-        'art_aeneas': {
-            sub: '2026',
-            title: 'Aeneas Anchises and Ascanius',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/aeneas anchises and ascanius_full.webp'
-        },
-        'art_victory': {
-            sub: '2026',
-            title: 'Angel with Victory',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/angel with victory_full.webp'
-        },
-        'art_angel_08': {
-            sub: '2026',
-            title: 'Angel 08-02',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/angel_08-02_full.webp'
-        },
-        'art_anghel_02': {
-            sub: '2026',
-            title: 'Anghel 02',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/anghel_02_full.webp'
-        },
-        'art_pieta': {
-            sub: '2026',
-            title: 'Pieta',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/pieta_full.webp'
-        },
-        'art_bronze': {
-            sub: '2026',
-            title: 'The Age of Bronze',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/the age of bronze_full.webp'
-        },
-        'art_k1': {
-            sub: '2026',
-            title: 'Artwork 01',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_01_full.webp'
-        },
-        'art_k2': {
-            sub: '2026',
-            title: 'Artwork 02',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_02_full.webp'
-        },
-        'art_k3': {
-            sub: '2026',
-            title: 'Artwork 03',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_03_full.webp'
-        },
-        'art_k4': {
-            sub: '2026',
-            title: 'Artwork 04',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_04_full.webp'
-        },
-        'art_k5': {
-            sub: '2026',
-            title: 'Artwork 05',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_05_full.webp'
-        },
-        'art_k7': {
-            sub: '2026',
-            title: 'Artwork 07',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_07_full.webp'
-        },
-        'art_k8': {
-            sub: '2026',
-            title: 'Artwork 08',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_08_full.webp'
-        },
-        'art_k_cover': {
-            sub: '2026',
-            title: 'Artwork Collection',
-            desc: 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
-            image: 'assets/ARTWORKS/images/KakaoTalk_20260831_123725447_full.webp'
-        },
-        };
+                        // Auto-generate portfolio deck
+        window.addEventListener('DOMContentLoaded', () => {
+            const deck = document.getElementById('dynamic-portfolio-deck');
+            if (deck && typeof artworksList !== 'undefined') {
+                let html = '';
+                artworksList.forEach(art => {
+                    html += `
+                    <div class="portfolio-card" onclick="openProject('` + art.id + `')">
+                        <div class="card-image-placeholder" style="background: url('` + art.thumb + `') center/cover; position: relative;">
+                        </div>
+                        <div class="card-info" style="padding: 1.5rem;">
+                            <p>` + art.sub + `</p>
+                            <h3>` + art.title + `</h3>
+                        </div>
+                    </div>`;
+                });
+                deck.innerHTML = html;
+            }
+        });
 
+        const artworks = (typeof artworksList !== "undefined") ? Object.fromEntries(artworksList.map(a => [a.id, a])) : {};
         const modal = document.getElementById('project-modal');
         const modalBackdrop = document.getElementById('modal-backdrop');
         const modalSub = document.getElementById('modal-subtitle');
@@ -364,4 +172,7 @@
     </svg>
 </body>
 </html>
+
+
+
 
