@@ -4,16 +4,12 @@ import os
 artworks_root = 'assets/ARTWORKS'
 categories = []
 
+modal_desc = "시각적 이미지를 떠올리지 못한다고 해서 상상력이 부족한 것은 아닙니다. 감각, 경험, 논리를 통한 당신만의 독특한 사고방식이 세상에 새로운 영감을 줍니다. 상상이 아닌, 창조로 말하라."
+
 for cat in os.listdir(artworks_root):
     if cat == 'images': continue
     cat_path = os.path.join(artworks_root, cat)
     if not os.path.isdir(cat_path): continue
-    
-    desc_path = os.path.join(cat_path, 'desc.txt')
-    desc = ''
-    if os.path.exists(desc_path):
-        with open(desc_path, 'r', encoding='utf-8') as f:
-            desc = f.read()
             
     files = [f for f in os.listdir(cat_path) if f != 'desc.txt']
     
@@ -37,15 +33,22 @@ for cat in os.listdir(artworks_root):
         if item['full'] and not item['thumb']: item['thumb'] = item['full']
         if not item['full']: continue
         
-        title = k.replace('_', ' ').title()
+        # Check if it's one of the 5 new posters
+        is_poster = k.upper().startswith('PORTFOLIO') or k.upper().startswith('POSTER')
+        
+        if is_poster:
+            title = "APHANTASIA A VISUAL EXPLORATION"
+        else:
+            title = k.replace('_', ' ').title()
         
         works.append({
             'id': ''.join(e for e in k if e.isalnum() or e == '_'),
-            'sub': '2026',
+            'sub': '2024',
             'title': title,
-            'desc': 'A digital restoration and exploration of form and space. Rendered in full high-fidelity 3D.',
+            'desc': modal_desc,
             'thumb': 'assets/ARTWORKS/' + cat + '/' + item['thumb'],
-            'image': 'assets/ARTWORKS/' + cat + '/' + item['full']
+            'image': 'assets/ARTWORKS/' + cat + '/' + item['full'],
+            'is_poster': is_poster
         })
         
         # Specifically look for PORTFOLIO for cover
@@ -60,7 +63,6 @@ for cat in os.listdir(artworks_root):
         'title': cat,
         'cover': cover,
         'count': len(works),
-        'desc': desc,
         'works': works
     })
 
