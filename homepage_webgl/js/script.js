@@ -173,15 +173,13 @@ if(canvas) {
 
             void main() {
                 vec2 pixelCoord = vUv * uResolution;
-                // vUv.y in WebGL starts at 0 from bottom. 
                 
                 bool isSidebar = pixelCoord.x < uSidebarRight;
                 bool isModal = pixelCoord.y < uModalTop;
                 
                 if (isSidebar || isModal) {
-                    // Glass effect (100% GPU)
                     float noise = rand(vUv) * 2.0 - 1.0;
-                    float shift = 0.005 + noise * 0.001; // Chromatic aberration scale
+                    float shift = 0.005 + noise * 0.001; 
                     
                     vec2 uvR = vUv + vec2(shift, 0.0);
                     vec2 uvG = vUv;
@@ -190,20 +188,22 @@ if(canvas) {
                     vec4 color = vec4(0.0);
                     float blurSize = 3.5 / uResolution.x;
                     
-                    // 9-tap blur box
-                    for(float x = -1.0; x <= 1.0; x++) {
-                        for(float y = -1.0; y <= 1.0; y++) {
-                            vec2 offset = vec2(x, y) * blurSize;
-                            color.r += texture2D(tDiffuse, uvR + offset).r;
-                            color.g += texture2D(tDiffuse, uvG + offset).g;
-                            color.b += texture2D(tDiffuse, uvB + offset).b;
-                        }
+                    // WebGL 1.0 호환성과 완벽한 하드웨어 가속을 위해 for 루프를 수동으로 풀어(Unroll)서 작성
+                    vec2 offsets[9];
+                    offsets[0] = vec2(-1.0, -1.0); offsets[1] = vec2(0.0, -1.0); offsets[2] = vec2(1.0, -1.0);
+                    offsets[3] = vec2(-1.0,  0.0); offsets[4] = vec2(0.0,  0.0); offsets[5] = vec2(1.0,  0.0);
+                    offsets[6] = vec2(-1.0,  1.0); offsets[7] = vec2(0.0,  1.0); offsets[8] = vec2(1.0,  1.0);
+                    
+                    for(int i = 0; i < 9; i++) {
+                        vec2 offset = offsets[i] * blurSize;
+                        color.r += texture2D(tDiffuse, uvR + offset).r;
+                        color.g += texture2D(tDiffuse, uvG + offset).g;
+                        color.b += texture2D(tDiffuse, uvB + offset).b;
                     }
                     color /= 9.0;
                     
-                    // Liquid Glass Brightness & Tint (match CSS)
                     color.rgb *= 1.5; 
-                    color.rgb = mix(color.rgb, vec3(0.04, 0.06, 0.1), 0.5); // Dark tint
+                    color.rgb = mix(color.rgb, vec3(0.04, 0.06, 0.1), 0.5);
                     
                     gl_FragColor = vec4(color.rgb, 1.0);
                 } else {
