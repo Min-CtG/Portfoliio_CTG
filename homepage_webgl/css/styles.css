@@ -4,7 +4,7 @@
 :root {
     --bg-color: #030508; 
     --text-color: #f7f6f3;
-    --text-muted: #a0a0a0; /* Made slightly brighter for better readability */
+    --text-muted: #a0a0a0;
     --accent-color: #ffffff;
     --font-heading: 'Syne', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -60,12 +60,8 @@ nav.nav-glass {
     display: flex;
     align-items: center;
     z-index: 100;
-    
-    /* 완벽한 투명화 (상단에는 메뉴 버튼과 로고만 둥둥 떠있게) */
     background: transparent;
     border-bottom: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     box-shadow: none;
 }
 
@@ -126,7 +122,7 @@ nav.nav-glass {
 }
 
 .hero-content {
-    z-index: 10; /* Boosted z-index to ensure it sits on top of everything */
+    z-index: 10;
     max-width: 900px;
     padding: 2rem;
 }
@@ -136,14 +132,14 @@ nav.nav-glass {
     line-height: 1.1;
     letter-spacing: -2px;
     margin-bottom: 1.5rem;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.8); /* Added shadow for readability against bright sphere */
+    text-shadow: 0 4px 20px rgba(0,0,0,0.8);
 }
 
 .hero-subtitle {
     font-family: var(--font-tech);
     font-size: 1rem;
     margin-bottom: 3rem;
-    color: #e0e0e0; /* Made brighter */
+    color: #e0e0e0;
     text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 
@@ -156,7 +152,7 @@ nav.nav-glass {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.85rem;
-    backdrop-filter: blur(5px);
+    /* backdrop-filter 제거 - WebGL이 처리 */
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -251,11 +247,7 @@ nav.nav-glass {
 .glassmorphism {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(25px) saturate(150%);
-    -webkit-backdrop-filter: blur(25px) saturate(150%);
-    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.4);
-    -webkit-backdrop-filter: blur(25px) saturate(150%);
-    -webkit-backdrop-filter: blur(25px) saturate(150%);
+    /* backdrop-filter 제거 - WebGL이 처리 */
     box-shadow: 5px 0 30px rgba(0, 0, 0, 0.4);
     border-radius: 4px; 
 }
@@ -265,7 +257,7 @@ nav.nav-glass {
     aspect-ratio: 1/1;
     position: relative;
     overflow: hidden;
-    background: #000; /* Darker background so the point cloud pops */
+    background: #000;
 }
 
 /* Exhibition Page Styles */
@@ -347,6 +339,7 @@ footer {
     .gs-viewer-placeholder { height: 50vh; }
     .gallery { gap: 6rem; }
 }
+
 /* Card Deck Layout */
 .portfolio-deck {
     display: grid;
@@ -366,7 +359,7 @@ footer {
     overflow: hidden;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(10px);
+    /* backdrop-filter 제거 - WebGL이 처리 */
 }
 
 .portfolio-card:hover {
@@ -397,15 +390,12 @@ footer {
 .modal-backdrop {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.5);
+    /* backdrop-filter 완전 제거 (WebGL 쉐이더가 대신 처리) */
     z-index: 999;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
-    will-change: opacity; /* 렌더링 최적화 */
-    transform: translateZ(0); /* GPU 가속 강제 (Stuttering 방지) */
 }
 
 .modal-backdrop.active {
@@ -418,11 +408,10 @@ footer {
     position: fixed;
     bottom: 0; left: 0; width: 100%; 
     height: 90vh;
-    background: hsl(0 0% 0% / 0.15);
-    backdrop-filter: url(#glass-filter) blur(15px) saturate(1.2);
-    -webkit-backdrop-filter: url(#glass-filter) blur(15px) saturate(1.2);
+    background: transparent;
+    /* CSS 필터 제거 (WebGL 쉐이더가 대신 처리함) */
     
-    /* 사이트에 있는 5겹의 3D 굴절 이너 쉐도우 (두꺼운 유리 볼륨감 형성) */
+    /* 5겹의 3D 굴절 이너 쉐도우 (두꺼운 유리 볼륨감 형성) */
     box-shadow: 
         inset 0 0 2px 1px #ffffff59, 
         inset 0 0 10px 4px #ffffff26, 
@@ -443,8 +432,8 @@ footer {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     
-    transform: translate3d(0, 100%, 0); /* 3D transform 강제 (GPU 가속) */
-    will-change: transform; /* 애니메이션 렌더링 최적화 */
+    transform: translate3d(0, 100%, 0);
+    will-change: transform;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -487,21 +476,7 @@ footer {
     z-index: 10;
 }
 .modal-close:hover { transform: scale(1.1); }
-f a d e B o b 
- 
-   > >   " C : \ U s e r s \ H P \ D e s k t o p \ h t m l - p o r t p o l i o - 3 d g s \ h o m e p a g e \ s t y l e s . c s s " 
- 
- e c h o       0 % % ,   1 0 0 % %   {   t r a n s f o r m :   t r a n s l a t e Y ( 0 ) ;   o p a c i t y :   0 . 3 ;   }   > >   " C : \ U s e r s \ H P \ D e s k t o p \ h t m l - p o r t p o l i o - 3 d g s \ h o m e p a g e \ s t y l 
- 
- e s . c s s " 
- 
- e c h o       5 0 % %   {   t r a n s f o r m :   t r a n s l a t e Y ( 1 0 p x ) ;   o p a c i t y :   0 . 8 ;   }   > >   " C : \ U s e r s \ H P \ D e s k t o p \ h t m l - p o r t p o l i o - 3 d g s \ h o m e p a g e \ s t y l e s . 
- 
- c s s " 
- 
- e c h o   
- 
- 
+
 @keyframes fadeBob {
   0%, 100% { transform: translateY(0); opacity: 0.3; }
   50% { transform: translateY(10px); opacity: 0.8; }
@@ -524,7 +499,6 @@ f a d e B o b 
     transition: all 0.3s ease;
 }
 .menu-btn:hover .h-line {
-    background-color: var(--text-muted);
     background-color: var(--accent-color);
     transform: scaleX(1.1);
 }
@@ -540,7 +514,7 @@ f a d e B o b 
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s ease;
-    backdrop-filter: blur(5px);
+    /* backdrop-filter 완전 제거 (WebGL 쉐이더가 대신 처리) */
 }
 .sidebar-overlay.active {
     opacity: 1;
@@ -559,12 +533,10 @@ f a d e B o b 
     flex-direction: column;
     padding: 3rem 2rem;
     
-    /* FreeFrontend CSS Liquid Glass 효과 완벽 복사 (SVG 크로마틱 수차 필터 적용) */
-    background: hsl(0 0% 0% / 0.15);
-    backdrop-filter: url(#glass-filter) blur(15px) saturate(1.2);
-    -webkit-backdrop-filter: url(#glass-filter) blur(15px) saturate(1.2);
+    /* CSS 필터 제거 (WebGL 쉐이더가 대신 처리함) */
+    background: transparent;
     
-    /* 사이트에 있는 5겹의 3D 굴절 이너 쉐도우 (두꺼운 유리 볼륨감 형성) */
+    /* 5겹의 3D 굴절 이너 쉐도우 (두꺼운 유리 볼륨감 형성) */
     box-shadow: 
         inset 0 0 2px 1px #ffffff59, 
         inset 0 0 10px 4px #ffffff26, 
@@ -574,7 +546,7 @@ f a d e B o b 
         10px 0 40px rgba(0, 0, 0, 0.8);
     
     border: none;
-    border-radius: 0 30px 30px 0; /* 샘플의 둥근 알약 형태처럼 사이드바 모서리 둥글게 */
+    border-radius: 0 30px 30px 0;
     will-change: transform;
 }
 .sidebar.active {
@@ -621,8 +593,6 @@ f a d e B o b 
     margin-top: 1rem;
     text-align: center;
 }
-
-
 
 .vision-box canvas {
     position: absolute !important;

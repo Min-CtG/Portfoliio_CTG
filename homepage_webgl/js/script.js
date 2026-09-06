@@ -139,10 +139,13 @@ if(canvas) {
     });
     // 해상도는 원상복구(뭉개짐 해결)하되, 고해상도 뻥튀기는 방지
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // --- WebGL 최적화: 커스텀 글래스 쉐이더 파이프라인 (CPU 개입 0%) ---
-    const renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+    // RenderTarget은 절반 해상도로 생성하여 GPU 부하를 50% 절감
+    const rtWidth = Math.floor(window.innerWidth * 0.5);
+    const rtHeight = Math.floor(window.innerHeight * 0.5);
+    const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
     const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const postScene = new THREE.Scene();
 
@@ -225,7 +228,7 @@ if(canvas) {
     const isExhibition = document.body.classList.contains('exhibition-page');
     const isArtworks = document.body.classList.contains('artworks-page');
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 10000; // 최적화: 20000 -> 10000
+    const particlesCount = 20000; // 선명한 구를 위해 파티클 수 복구
     const posArray = new Float32Array(particlesCount * 3);
     const colorsArray = new Float32Array(particlesCount * 3);
     const radius = 22;
@@ -460,27 +463,37 @@ if(canvas) {
         dustMesh.rotation.y = (elapsedTime * 0.015) + (normX * 0.03);
         dustMesh.rotation.x = -normY * 0.03;
 
-        // --- 100% GPU WebGL Glass Shader Update (No DOM Layout Thrashing!) ---
-        // DOM을 직접 읽어오면(getBoundingClientRect) CPU 렉이 엄청나게 발생하므로 JS 변수로 스무스하게 보간(Lerp)합니다.
-        
+        // --- 핵심 최적화: 유리 효과가 필요할 때만 2-pass 렌더링, 아니면 1-pass ---
         const sidebar = document.getElementById('sidebar');
-        const targetSidebarRight = (sidebar && sidebar.classList.contains('active')) ? 300.0 : 0.0;
-        currentSidebarRight += (targetSidebarRight - currentSidebarRight) * 0.15;
-        postMaterial.uniforms.uSidebarRight.value = currentSidebarRight;
-        
+        const sidebarActive = sidebar && sidebar.classList.contains('active');
         const modal = document.querySelector('.project-modal');
-        const targetModalTop = (modal && modal.classList.contains('active')) ? window.innerHeight * 0.9 : 0.0;
-        currentModalTop += (targetModalTop - currentModalTop) * 0.15;
-        postMaterial.uniforms.uModalTop.value = currentModalTop;
-
-        // 1. Scene을 안 보이는 텍스처(RenderTarget)에 렌더링
-        renderer.setRenderTarget(renderTarget);
-        renderer.render(scene, camera);
+        const modalActive = modal && modal.classList.contains('active');
         
-        // 2. 텍스처를 화면 전체(Quad)에 띄우면서 쉐이더(굴절, 블러) 적용
-        renderer.setRenderTarget(null);
-        postMaterial.uniforms.tDiffuse.value = renderTarget.texture;
-        renderer.render(postScene, postCamera);
+        const needGlass = sidebarActive || modalActive;
+        
+        if (needGlass) {
+            // 유리 효과 ON: 2-pass 렌더링
+            const targetSidebarRight = sidebarActive ? 300.0 : 0.0;
+            currentSidebarRight += (targetSidebarRight - currentSidebarRight) * 0.15;
+            postMaterial.uniforms.uSidebarRight.value = currentSidebarRight;
+            
+            const targetModalTop = modalActive ? window.innerHeight * 0.9 : 0.0;
+            currentModalTop += (targetModalTop - currentModalTop) * 0.15;
+            postMaterial.uniforms.uModalTop.value = currentModalTop;
+
+            renderer.setRenderTarget(renderTarget);
+            renderer.render(scene, camera);
+            
+            renderer.setRenderTarget(null);
+            postMaterial.uniforms.tDiffuse.value = renderTarget.texture;
+            renderer.render(postScene, postCamera);
+        } else {
+            // 유리 효과 OFF: 1-pass 렌더링 (오버워치와 동일한 방식)
+            currentSidebarRight = 0;
+            currentModalTop = 0;
+            renderer.setRenderTarget(null);
+            renderer.render(scene, camera);
+        }
     }
     animate();
 
@@ -488,8 +501,8 @@ if(canvas) {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderTarget.setSize(window.innerWidth, window.innerHeight);
-        postMaterial.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+        renderTarget.setSize(Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.5));
+        postMaterial.uniforms.uResolution.value.set(Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.5));
     });
 }
 
