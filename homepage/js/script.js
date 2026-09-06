@@ -139,12 +139,96 @@ if(canvas) {
     });
     // 해상도는 원상복구(뭉개짐 해결)하되, 고해상도 뻥튀기는 방지
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // --- WebGL 최적화: 커스텀 글래스 쉐이더 파이프라인 (CPU 개입 0%) ---
+    // RenderTarget은 절반 해상도로 생성하여 GPU 부하를 50% 절감
+    const rtWidth = Math.floor(window.innerWidth * 0.5);
+    const rtHeight = Math.floor(window.innerHeight * 0.5);
+    const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
+    const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const postScene = new THREE.Scene();
+
+    const glassShader = {
+        uniforms: {
+            tDiffuse: { value: null },
+            uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            uSidebarRight: { value: 0.0 },
+            uModalTop: { value: 0.0 } 
+        },
+        vertexShader: `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform sampler2D tDiffuse;
+            uniform vec2 uResolution;
+            uniform float uSidebarRight;
+            uniform float uModalTop;
+            varying vec2 vUv;
+
+            float rand(vec2 co){
+                return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+            }
+
+            void main() {
+                vec2 pixelCoord = vUv * uResolution;
+                
+                bool isSidebar = pixelCoord.x < uSidebarRight;
+                bool isModal = pixelCoord.y < uModalTop;
+                
+                if (isSidebar || isModal) {
+                    float noise = rand(vUv) * 2.0 - 1.0;
+                    float shift = 0.005 + noise * 0.001; 
+                    
+                    vec2 uvR = vUv + vec2(shift, 0.0);
+                    vec2 uvG = vUv;
+                    vec2 uvB = vUv - vec2(shift, 0.0);
+                    
+                    vec4 color = vec4(0.0);
+                    float blurSize = 3.5 / uResolution.x;
+                    
+                    // WebGL 1.0 호환성과 완벽한 하드웨어 가속을 위해 for 루프를 수동으로 풀어(Unroll)서 작성
+                    vec2 offsets[9];
+                    offsets[0] = vec2(-1.0, -1.0); offsets[1] = vec2(0.0, -1.0); offsets[2] = vec2(1.0, -1.0);
+                    offsets[3] = vec2(-1.0,  0.0); offsets[4] = vec2(0.0,  0.0); offsets[5] = vec2(1.0,  0.0);
+                    offsets[6] = vec2(-1.0,  1.0); offsets[7] = vec2(0.0,  1.0); offsets[8] = vec2(1.0,  1.0);
+                    
+                    for(int i = 0; i < 9; i++) {
+                        vec2 offset = offsets[i] * blurSize;
+                        color.r += texture2D(tDiffuse, uvR + offset).r;
+                        color.g += texture2D(tDiffuse, uvG + offset).g;
+                        color.b += texture2D(tDiffuse, uvB + offset).b;
+                    }
+                    color /= 9.0;
+                    
+                    // 유리 뒤의 파티클이 너무 밝아지지 않도록 밝기를 억제하고, 어두운 틴트를 강하게 적용
+                    color.rgb = mix(color.rgb, vec3(0.03, 0.04, 0.08), 0.7);
+                    
+                    gl_FragColor = vec4(color.rgb, 1.0);
+                } else {
+                    gl_FragColor = texture2D(tDiffuse, vUv);
+                }
+            }
+        `
+    };
+
+    const postMaterial = new THREE.ShaderMaterial({
+        uniforms: glassShader.uniforms,
+        vertexShader: glassShader.vertexShader,
+        fragmentShader: glassShader.fragmentShader
+    });
+    const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial);
+    postScene.add(postQuad);
+    // --- 쉐이더 파이프라인 끝 ---
 
     const isExhibition = document.body.classList.contains('exhibition-page');
     const isArtworks = document.body.classList.contains('artworks-page');
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 10000; // 최적화: 20000 -> 10000
+    const particlesCount = 20000; // 선명한 구를 위해 파티클 수 복구
     const posArray = new Float32Array(particlesCount * 3);
     const colorsArray = new Float32Array(particlesCount * 3);
     const radius = 22;
@@ -278,7 +362,8 @@ if(canvas) {
         particlesMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
         
         mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(progress, 0.5));
-        particlesMesh.visible = mainParticlesMaterial.opacity > 0.05;
+        // visible을 false로 만들지 않음 - 모바일에서 스크롤을 올렸을 때 구가 안 보이는 버그 방지
+        // 대신 opacity가 0에 가까워지면 자연스럽게 안 보이게 됨
     });
 
     // --- 깔끔하고 통일성 있는 배경: Cinematic Ambient Gaussian Dust (Bokeh Effect) ---
@@ -356,34 +441,60 @@ if(canvas) {
     let targetRotationY = 0;
     const clock = new THREE.Clock();
 
+    let currentSidebarRight = 0;
+    let currentModalTop = 0;
+
     function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
         
-        if (particlesMesh.visible) {
+        if (mainParticlesMaterial.opacity > 0.01) {
             if (isExhibition || isArtworks) {
-                // 조각상 모드 (Exhibition & Artworks):
-                // 마우스가 화면 끝으로 가면 고개를 완전히 돌릴 수 있도록 민감도를 높임
                 targetRotationY = normX * 1.2;
                 targetRotationX = -normY * 1.2;
             } else {
-                // 기본 홈 화면 모드 (Sphere):
-                // 은은하게 계속 자전하는 효과 + 마우스 미세 반응
                 targetRotationY = (normX * 0.3) + (elapsedTime * 0.02);
                 targetRotationX = (-normY * 0.3) + (elapsedTime * 0.01);
             }
-
             particlesMesh.rotation.y += (targetRotationY - particlesMesh.rotation.y) * 0.05;
             particlesMesh.rotation.x += (targetRotationX - particlesMesh.rotation.x) * 0.05;
         }
 
-        // [최적화] 전체 Mesh 자체를 미세하게 회전시켜 완벽하게 동일한 '먼지가 부유하는 느낌'을 주면서 CPU 부하를 0으로 만듭니다.
-        // 먼지 파티클은 아주 천천히 자전하며 마우스 움직임에 매우 둔하게 반응
         dustMesh.rotation.z = elapsedTime * 0.02;
         dustMesh.rotation.y = (elapsedTime * 0.015) + (normX * 0.03);
         dustMesh.rotation.x = -normY * 0.03;
 
-        renderer.render(scene, camera);
+        // --- 핵심 최적화: 유리 효과가 필요할 때만 2-pass 렌더링, 아니면 1-pass ---
+        const sidebar = document.getElementById('sidebar');
+        const sidebarActive = sidebar && sidebar.classList.contains('active');
+        const modal = document.querySelector('.project-modal');
+        const modalActive = modal && modal.classList.contains('active');
+        
+        const needGlass = sidebarActive || modalActive;
+        
+        if (needGlass) {
+            // 유리 효과 ON: 2-pass 렌더링
+            const targetSidebarRight = sidebarActive ? 300.0 : 0.0;
+            currentSidebarRight += (targetSidebarRight - currentSidebarRight) * 0.15;
+            postMaterial.uniforms.uSidebarRight.value = currentSidebarRight;
+            
+            const targetModalTop = modalActive ? window.innerHeight * 0.9 : 0.0;
+            currentModalTop += (targetModalTop - currentModalTop) * 0.15;
+            postMaterial.uniforms.uModalTop.value = currentModalTop;
+
+            renderer.setRenderTarget(renderTarget);
+            renderer.render(scene, camera);
+            
+            renderer.setRenderTarget(null);
+            postMaterial.uniforms.tDiffuse.value = renderTarget.texture;
+            renderer.render(postScene, postCamera);
+        } else {
+            // 유리 효과 OFF: 1-pass 렌더링 (오버워치와 동일한 방식)
+            currentSidebarRight = 0;
+            currentModalTop = 0;
+            renderer.setRenderTarget(null);
+            renderer.render(scene, camera);
+        }
     }
     animate();
 
@@ -391,6 +502,8 @@ if(canvas) {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderTarget.setSize(Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.5));
+        postMaterial.uniforms.uResolution.value.set(Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.5));
     });
 }
 
