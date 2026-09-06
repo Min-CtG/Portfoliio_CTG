@@ -205,8 +205,8 @@ if(canvas) {
                     }
                     color /= 9.0;
                     
-                    color.rgb *= 1.5; 
-                    color.rgb = mix(color.rgb, vec3(0.04, 0.06, 0.1), 0.5);
+                    // 유리 뒤의 파티클이 너무 밝아지지 않도록 밝기를 억제하고, 어두운 틴트를 강하게 적용
+                    color.rgb = mix(color.rgb, vec3(0.03, 0.04, 0.08), 0.7);
                     
                     gl_FragColor = vec4(color.rgb, 1.0);
                 } else {
@@ -362,7 +362,8 @@ if(canvas) {
         particlesMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
         
         mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(progress, 0.5));
-        particlesMesh.visible = mainParticlesMaterial.opacity > 0.05;
+        // visible을 false로 만들지 않음 - 모바일에서 스크롤을 올렸을 때 구가 안 보이는 버그 방지
+        // 대신 opacity가 0에 가까워지면 자연스럽게 안 보이게 됨
     });
 
     // --- 깔끔하고 통일성 있는 배경: Cinematic Ambient Gaussian Dust (Bokeh Effect) ---
@@ -447,7 +448,7 @@ if(canvas) {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
         
-        if (particlesMesh.visible) {
+        if (mainParticlesMaterial.opacity > 0.01) {
             if (isExhibition || isArtworks) {
                 targetRotationY = normX * 1.2;
                 targetRotationX = -normY * 1.2;
