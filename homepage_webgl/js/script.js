@@ -141,6 +141,87 @@ if(canvas) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(1);
 
+    // --- WebGL 최적화: 커스텀 글래스 쉐이더 파이프라인 (CPU 개입 0%) ---
+    const renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+    const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const postScene = new THREE.Scene();
+
+    const glassShader = {
+        uniforms: {
+            tDiffuse: { value: null },
+            uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            uSidebarRight: { value: 0.0 },
+            uModalTop: { value: 0.0 } 
+        },
+        vertexShader: `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform sampler2D tDiffuse;
+            uniform vec2 uResolution;
+            uniform float uSidebarRight;
+            uniform float uModalTop;
+            varying vec2 vUv;
+
+            float rand(vec2 co){
+                return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+            }
+
+            void main() {
+                vec2 pixelCoord = vUv * uResolution;
+                // vUv.y in WebGL starts at 0 from bottom. 
+                
+                bool isSidebar = pixelCoord.x < uSidebarRight;
+                bool isModal = pixelCoord.y < uModalTop;
+                
+                if (isSidebar || isModal) {
+                    // Glass effect (100% GPU)
+                    float noise = rand(vUv) * 2.0 - 1.0;
+                    float shift = 0.005 + noise * 0.001; // Chromatic aberration scale
+                    
+                    vec2 uvR = vUv + vec2(shift, 0.0);
+                    vec2 uvG = vUv;
+                    vec2 uvB = vUv - vec2(shift, 0.0);
+                    
+                    vec4 color = vec4(0.0);
+                    float blurSize = 3.5 / uResolution.x;
+                    
+                    // 9-tap blur box
+                    for(float x = -1.0; x <= 1.0; x++) {
+                        for(float y = -1.0; y <= 1.0; y++) {
+                            vec2 offset = vec2(x, y) * blurSize;
+                            color.r += texture2D(tDiffuse, uvR + offset).r;
+                            color.g += texture2D(tDiffuse, uvG + offset).g;
+                            color.b += texture2D(tDiffuse, uvB + offset).b;
+                        }
+                    }
+                    color /= 9.0;
+                    
+                    // Liquid Glass Brightness & Tint (match CSS)
+                    color.rgb *= 1.5; 
+                    color.rgb = mix(color.rgb, vec3(0.04, 0.06, 0.1), 0.5); // Dark tint
+                    
+                    gl_FragColor = vec4(color.rgb, 1.0);
+                } else {
+                    gl_FragColor = texture2D(tDiffuse, vUv);
+                }
+            }
+        `
+    };
+
+    const postMaterial = new THREE.ShaderMaterial({
+        uniforms: glassShader.uniforms,
+        vertexShader: glassShader.vertexShader,
+        fragmentShader: glassShader.fragmentShader
+    });
+    const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial);
+    postScene.add(postQuad);
+    // --- 쉐이더 파이프라인 끝 ---
+
     const isExhibition = document.body.classList.contains('exhibition-page');
     const isArtworks = document.body.classList.contains('artworks-page');
     const particlesGeometry = new THREE.BufferGeometry();
@@ -356,34 +437,50 @@ if(canvas) {
     let targetRotationY = 0;
     const clock = new THREE.Clock();
 
+    let currentSidebarRight = 0;
+    let currentModalTop = 0;
+
     function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
         
         if (particlesMesh.visible) {
             if (isExhibition || isArtworks) {
-                // 조각상 모드 (Exhibition & Artworks):
-                // 마우스가 화면 끝으로 가면 고개를 완전히 돌릴 수 있도록 민감도를 높임
                 targetRotationY = normX * 1.2;
                 targetRotationX = -normY * 1.2;
             } else {
-                // 기본 홈 화면 모드 (Sphere):
-                // 은은하게 계속 자전하는 효과 + 마우스 미세 반응
                 targetRotationY = (normX * 0.3) + (elapsedTime * 0.02);
                 targetRotationX = (-normY * 0.3) + (elapsedTime * 0.01);
             }
-
             particlesMesh.rotation.y += (targetRotationY - particlesMesh.rotation.y) * 0.05;
             particlesMesh.rotation.x += (targetRotationX - particlesMesh.rotation.x) * 0.05;
         }
 
-        // [최적화] 전체 Mesh 자체를 미세하게 회전시켜 완벽하게 동일한 '먼지가 부유하는 느낌'을 주면서 CPU 부하를 0으로 만듭니다.
-        // 먼지 파티클은 아주 천천히 자전하며 마우스 움직임에 매우 둔하게 반응
         dustMesh.rotation.z = elapsedTime * 0.02;
         dustMesh.rotation.y = (elapsedTime * 0.015) + (normX * 0.03);
         dustMesh.rotation.x = -normY * 0.03;
 
+        // --- 100% GPU WebGL Glass Shader Update (No DOM Layout Thrashing!) ---
+        // DOM을 직접 읽어오면(getBoundingClientRect) CPU 렉이 엄청나게 발생하므로 JS 변수로 스무스하게 보간(Lerp)합니다.
+        
+        const sidebar = document.getElementById('sidebar');
+        const targetSidebarRight = (sidebar && sidebar.classList.contains('active')) ? 300.0 : 0.0;
+        currentSidebarRight += (targetSidebarRight - currentSidebarRight) * 0.15;
+        postMaterial.uniforms.uSidebarRight.value = currentSidebarRight;
+        
+        const modal = document.querySelector('.project-modal');
+        const targetModalTop = (modal && modal.classList.contains('active')) ? window.innerHeight * 0.9 : 0.0;
+        currentModalTop += (targetModalTop - currentModalTop) * 0.15;
+        postMaterial.uniforms.uModalTop.value = currentModalTop;
+
+        // 1. Scene을 안 보이는 텍스처(RenderTarget)에 렌더링
+        renderer.setRenderTarget(renderTarget);
         renderer.render(scene, camera);
+        
+        // 2. 텍스처를 화면 전체(Quad)에 띄우면서 쉐이더(굴절, 블러) 적용
+        renderer.setRenderTarget(null);
+        postMaterial.uniforms.tDiffuse.value = renderTarget.texture;
+        renderer.render(postScene, postCamera);
     }
     animate();
 
@@ -391,6 +488,8 @@ if(canvas) {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderTarget.setSize(window.innerWidth, window.innerHeight);
+        postMaterial.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
     });
 }
 
