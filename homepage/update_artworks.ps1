@@ -1,4 +1,4 @@
-$artworksRoot = "assets\ARTWORKS"
+﻿$artworksRoot = "assets\ARTWORKS"
 $outputJs = "data\artworksData.js"
 
 if (-not (Test-Path $artworksRoot)) {
@@ -17,7 +17,8 @@ foreach ($dir in $subDirs) {
     $allFiles = Get-ChildItem -Path $dir.FullName -File
     $artworkMap = @{}
 
-    foreach ($file in $allFiles) {
+        foreach ($file in $allFiles) {
+        if ($file.Name -eq "desc.txt") { continue }
         $baseName = $file.BaseName -replace "_thumb$", "" -replace "_full$", ""
         
         if (-not $artworkMap.ContainsKey($baseName)) {
@@ -64,11 +65,18 @@ foreach ($dir in $subDirs) {
     }
 
     if ($works.Count -gt 0) {
+        $catDesc = ""
+        $descPath = Join-Path $dir.FullName "desc.txt"
+        if (Test-Path $descPath) {
+            $catDesc = [System.IO.File]::ReadAllText($descPath, [System.Text.Encoding]::UTF8)
+        }
+        
         $cat = [ordered]@{
             id = ($categoryName -replace "[^a-zA-Z0-9]", "_")
             title = $categoryName
             cover = $coverThumb
             count = $works.Count
+            desc = $catDesc
             works = $works
         }
         $categories += $cat
@@ -86,7 +94,7 @@ if (-not (Test-Path "data")) {
     New-Item -ItemType Directory -Path "data" | Out-Null
 }
 
-Set-Content -Path $outputJs -Value $jsContent -Encoding UTF8
+[System.IO.File]::WriteAllText($outputJs, $jsContent, [System.Text.Encoding]::UTF8)
 
 Write-Host "====================================================="
 Write-Host " Successfully generated artworks data!"
@@ -96,3 +104,6 @@ foreach ($cat in $categories) {
 }
 Write-Host "====================================================="
 Start-Sleep -Seconds 3
+
+
+

@@ -355,6 +355,25 @@ if(canvas) {
 
     const particlesMesh = new THREE.Points(particlesGeometry, mainParticlesMaterial);
     scene.add(particlesMesh);
+    
+    // Expose for toggle
+    window.particlesMesh = particlesMesh;
+    window.mainParticlesMaterial = mainParticlesMaterial;
+    
+    window.toggle3DModel = function(show) {
+        if (window.particlesMesh && window.mainParticlesMaterial) {
+            if (show) {
+                gsap.killTweensOf(window.mainParticlesMaterial);
+                window.particlesMesh.visible = true;
+                gsap.to(window.mainParticlesMaterial, { opacity: 0.8, duration: 1.0 });
+            } else {
+                gsap.killTweensOf(window.mainParticlesMaterial);
+                gsap.to(window.mainParticlesMaterial, { opacity: 0, duration: 0.8, onComplete: () => {
+                    window.particlesMesh.visible = false;
+                }});
+            }
+        }
+    };
 
     lenis.on('scroll', (e) => {
         // Math.max(0, ...) : 모바일에서 오버스크롤(바운스)시 e.scroll이 음수가 되면
@@ -364,7 +383,9 @@ if(canvas) {
         const scaleFactor = 1 + (progress * 1.5); 
         particlesMesh.scale.set(scaleFactor, scaleFactor, scaleFactor);
         
-        mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(progress, 0.5));
+        if (particlesMesh.visible) {
+            mainParticlesMaterial.opacity = 0.8 * (1 - Math.pow(progress, 0.5));
+        }
     });
 
     // --- 깔끔하고 통일성 있는 배경: Cinematic Ambient Gaussian Dust (Bokeh Effect) ---
@@ -810,3 +831,5 @@ window.toggleSidebar = function() {
         overlay.classList.toggle('active');
     }
 };
+
+
