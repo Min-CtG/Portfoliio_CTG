@@ -462,22 +462,25 @@ if(canvas) {
 
     let targetRotationX = 0;
     let targetRotationY = 0;
+    let autoSpinY = 0;
+    let autoSpinX = 0;
     const clock = new THREE.Clock();
-
-    let currentSidebarRight = 0;
-    let currentModalTop = 0;
 
     function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
+        const delta = clock.getDelta ? 0.016 : 0.016; // ~60fps frame time
         
         if (mainParticlesMaterial.opacity > 0.01) {
             if (isExhibition || isArtworks) {
                 targetRotationY = normX * 1.2;
                 targetRotationX = -normY * 1.2;
             } else {
-                targetRotationY = (normX * 0.3) + (elapsedTime * 0.02);
-                targetRotationX = (-normY * 0.3) + (elapsedTime * 0.01);
+                // 자동 회전은 누적 방식으로 적용 (마우스 입력을 압도하지 않음)
+                autoSpinY += 0.0003;
+                autoSpinX += 0.00015;
+                targetRotationY = (normX * 0.8) + autoSpinY;
+                targetRotationX = (-normY * 0.8) + autoSpinX;
             }
             particlesMesh.rotation.y += (targetRotationY - particlesMesh.rotation.y) * 0.05;
             particlesMesh.rotation.x += (targetRotationX - particlesMesh.rotation.x) * 0.05;
@@ -511,29 +514,8 @@ if(canvas) {
         }
 
         
-        if (needGlass) {
-            // 유리 효과 ON: 2-pass 렌더링
-            const targetSidebarRight = sidebarActive ? 300.0 : 0.0;
-            currentSidebarRight += (targetSidebarRight - currentSidebarRight) * 0.15;
-            postMaterial.uniforms.uSidebarRight.value = currentSidebarRight;
-            
-            const targetModalTop = modalActive ? window.innerHeight * 0.9 : 0.0;
-            currentModalTop += (targetModalTop - currentModalTop) * 0.15;
-            postMaterial.uniforms.uModalTop.value = currentModalTop;
-
-            renderer.setRenderTarget(renderTarget);
-            renderer.render(scene, camera);
-            
-            renderer.setRenderTarget(null);
-            postMaterial.uniforms.tDiffuse.value = renderTarget.texture;
-            renderer.render(postScene, postCamera);
-        } else {
-            // 유리 효과 OFF: 1-pass 렌더링 (오버워치와 동일한 방식)
-            currentSidebarRight = 0;
-            currentModalTop = 0;
-            renderer.setRenderTarget(null);
-            renderer.render(scene, camera);
-        }
+        // 항상 1-pass 고속 렌더링 유지 (사이드바 오픈 시에도 뚝뚝 끊김 없이 60fps 고정)
+        renderer.render(scene, camera);
     }
     animate();
 
@@ -846,6 +828,7 @@ window.toggleSidebar = function() {
     if(sidebar && overlay) {
         sidebar.classList.toggle('active');
         overlay.classList.toggle('active');
+        document.body.classList.toggle('sidebar-open');
     }
 };
 

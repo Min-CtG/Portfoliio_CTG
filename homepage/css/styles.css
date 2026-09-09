@@ -229,6 +229,18 @@ nav.nav-glass {
     content: ' */';
 }
 
+/* Modal Subtitle (e.g. 2024) - Clean text without comment marks */
+.project-modal .section-subtitle,
+#modal-subtitle {
+    letter-spacing: 2px;
+}
+.project-modal .section-subtitle::before,
+.project-modal .section-subtitle::after,
+#modal-subtitle::before,
+#modal-subtitle::after {
+    content: none !important;
+}
+
 .section-title {
     font-size: 3.5rem;
     margin-bottom: 2rem;
@@ -408,6 +420,7 @@ footer {
     position: fixed;
     bottom: 0; left: 0; width: 100%; 
     height: 90vh;
+    height: 90dvh;
     background: rgba(8, 11, 18, 0.88);
     /* WebGL 쉐이더의 유리 효과는 모서리/테두리에서 살짝 보이고, 내부는 불투명하게 */
     
@@ -432,13 +445,19 @@ footer {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     
-    transform: translate3d(0, 100%, 0);
-    will-change: transform;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate3d(0, 115%, 0);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity, visibility;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.5s;
 }
 
 .project-modal.active {
     transform: translate3d(0, 0, 0);
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .project-modal::-webkit-scrollbar {
@@ -509,48 +528,61 @@ footer {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
+    /* 반투명 오버레이 (블러는 body.sidebar-open에서 콘텐츠에 직접 적용) */
+    background: rgba(2, 4, 8, 0.45);
     z-index: 998;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s ease;
-    /* backdrop-filter 완전 제거 (WebGL 쉐이더가 대신 처리) */
+    pointer-events: none;
+    /* 닫힘: 0.22s 자연스럽게 사라짐 */
+    transition: opacity 0.22s ease-out, visibility 0.22s ease-out;
+    will-change: opacity;
+    transform: translateZ(0);
 }
 .sidebar-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+    /* 열림: 0.3s 페이드인 */
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+/* 사이드바 열릴 때: 사이드바·오버레이 빼고 뒤에 보이는 모든 것을 통째로 블러 */
+body.sidebar-open > *:not(#sidebar):not(#sidebar-overlay) {
+    filter: blur(6px);
+    transition: filter 0.3s ease-out;
 }
 
 .sidebar {
     position: fixed;
     top: 0;
-    left: -350px;
+    left: 0;
     width: 300px;
     height: 100vh;
     z-index: 999;
-    transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate3d(-100%, 0, 0);
+    /* 닫힘: 0.2s — 빠르지만 너무 순간적이지 않은 자연스러운 속도 */
+    transition: transform 0.2s cubic-bezier(0.4, 0, 1, 1);
+    will-change: transform;
     display: flex;
     flex-direction: column;
     padding: 3rem 2rem;
     
-    /* CSS 필터 제거 (WebGL 쉐이더가 대신 처리함) */
+    /* 원래의 투명도 및 스타일 100% 그대로 유지 */
     background: transparent;
     
-    /* 5겹의 3D 굴절 이너 쉐도우 (두꺼운 유리 볼륨감 형성) */
     box-shadow: 
         inset 0 0 2px 1px #ffffff59, 
-        inset 0 0 10px 4px #ffffff26, 
-        inset 0 4px 16px #11111a0d, 
-        inset 0 8px 24px #11111a0d, 
-        inset 0 6px 56px #11111a0d,
-        10px 0 40px rgba(0, 0, 0, 0.8);
+        inset 0 0 12px 3px #ffffff26, 
+        10px 0 30px rgba(0, 0, 0, 0.7);
     
     border: none;
     border-radius: 0 30px 30px 0;
-    will-change: transform;
 }
 .sidebar.active {
-    left: 0;
+    transform: translate3d(0, 0, 0);
+    /* 열림: 0.28s — 부드럽게 감속하며 슬라이드 인 */
+    transition: transform 0.28s cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 .sidebar-header {
