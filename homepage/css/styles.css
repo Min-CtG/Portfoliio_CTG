@@ -222,13 +222,6 @@ nav.nav-glass {
     margin-bottom: 1rem;
 }
 
-.section-subtitle::before {
-    content: '/* ';
-}
-.section-subtitle::after {
-    content: ' */';
-}
-
 /* Modal Subtitle (e.g. 2024) - Clean text without comment marks */
 .project-modal .section-subtitle,
 #modal-subtitle {

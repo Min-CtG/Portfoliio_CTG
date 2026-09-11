@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -76,7 +76,7 @@
         </div>
     </section>
 
-    <!-- 겹쳐 보이지 ?도????션 ?이???? ?백 추? -->
+    <!-- Add spacing to prevent overlapping sections -->
     <div style="height: 30vh;"></div>
 
     <!-- Vision Section 2: The Technology -->
@@ -96,7 +96,7 @@
         </div>
     </section>
 
-    <!-- ?션 ??립?을 ?해 ?일?게 ?? ?백 추? -->
+    <!-- Add consistent spacing for visual separation -->
     <div style="height: 30vh;"></div>
 
     
@@ -145,11 +145,11 @@
     <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
         <defs>
             <filter id="glass-filter">
-                <!-- 1. 저해상도 노이즈 생성 (유리의 미세한 굴절 패턴) -->
+                <!-- 1. Generate low-resolution noise (fine refraction pattern of glass) -->
                 <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="1" result="noise"></feTurbulence>
-                <!-- 2. 단일 채널 왜곡 (RGB 3단 분리 제거하여 연산량 70% 감소) -->
+                <!-- 2. Single-channel distortion (Reduced computation by 70% by eliminating RGB separation) -->
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" xChannelSelector="R" yChannelSelector="G" result="disp"></feDisplacementMap>
-                <!-- 3. 가벼운 블러 (블러 강도를 낮춰 GPU 부하 최소화) -->
+                <!-- 3. Light blur (Minimized GPU load by lowering blur intensity) -->
                 <feGaussianBlur in="disp" stdDeviation="2"></feGaussianBlur>
             </filter>
         </defs>

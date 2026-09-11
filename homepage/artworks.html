@@ -39,7 +39,7 @@
         </ul>
     </div>
 
-    <!-- ???硫?????諛곌꼍 罹붾쾭??異? (?????援? ???癒?媛 ????怨? -->
+    <!-- Background Canvas (3D scene background) -->
     <canvas id="bg-canvas"></canvas>
 
     <div class="exhibition-hero" style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
@@ -77,7 +77,7 @@
                 <h3 id="modal-title" class="section-title">Artwork Title</h3>
                 
                 <div style="margin: 1.5rem auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center;">
-                    <!-- ?湲??????????吏??????-->
+                    <!-- Image for modal (hidden by default) -->
                     <img id="modal-image" src="" alt="Artwork" style="width: 100%; max-height: 45vh; object-fit: contain; display: none; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));">
                     <span id="modal-img-placeholder" style="padding: 4rem; color: #555;">[ Full Resolution Image Here ]</span>
                 </div>
@@ -102,7 +102,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
-    <!-- ???CORS) 諛????蹂???議곌컖??????-->
+    <!-- Load 3D model data (converted to avoid CORS issues) -->
     <script src="data/faceData.js"></script>
     <script src="data/lucyData.js"></script>
     <script src="js/script.js"></script>
@@ -134,7 +134,9 @@
                 footerBtn.onclick = null;
             }
             
-            if (window.toggle3DModel) window.toggle3DModel(true);
+            // 3D 모델 서서히 나타나게 하기
+            if (typeof window.modelFade === 'undefined') window.modelFade = 1.0;
+            gsap.to(window, { modelFade: 1.0, duration: 1.5, ease: "power2.inOut" });
             
             if (container && typeof artworksData !== 'undefined') {
                 backBtn.style.display = 'none';
@@ -162,6 +164,7 @@
                 container.style.opacity = 0;
             container.innerHTML = htmlStr;
             gsap.to(container, { opacity: 1, duration: 1.0, ease: "power2.out" });
+            setTimeout(applyDynamicScrollAnimations, 100);
             }
         }
 
@@ -171,7 +174,9 @@
             
             currentWorks = cat.works; 
             
-            if (window.toggle3DModel) window.toggle3DModel(false);
+            // 3D 모델 희미하게 사라지게 하기
+            if (typeof window.modelFade === 'undefined') window.modelFade = 1.0;
+            gsap.to(window, { modelFade: 0.0, duration: 1.5, ease: "power2.inOut" });
             
             const container = document.getElementById('dynamic-content-area');
             const backBtn = document.getElementById('category-back-btn');
@@ -220,14 +225,14 @@
                 const posters = cat.works.filter(w => w.is_poster);
                 const others = cat.works.filter(w => !w.is_poster);
                 
-                // 1. 거대 중앙 히어로 타이틀 (전체 100vh 점유) & 수평 정중앙 고정 스크롤 다운 안내
+                // 1. Giant central hero title (takes 100vh) & perfectly centered scroll down indicator
                 htmlStr += `
                 <div class="category-hero" style="min-height: 100vh; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; padding: 0 1rem; box-sizing: border-box;">
-                    <h1 style="font-family: var(--font-heading); font-size: clamp(3.2rem, 9vw, 8rem); font-weight: 700; letter-spacing: 0.15em; padding-left: 0.15em; color: var(--text-color); text-transform: uppercase; margin: 0; line-height: 1; text-shadow: 0 0 40px rgba(255,255,255,0.2); text-align: center;">
+                    <h1 style="font-family: var(--font-heading); font-size: clamp(1.8rem, 7vw, 8rem); font-weight: 700; letter-spacing: 0.15em; padding-left: 0.15em; color: var(--text-color); text-transform: uppercase; margin: 0; line-height: 1; text-shadow: 0 0 40px rgba(255,255,255,0.2); text-align: center; word-break: break-word;">
                         APHANTASIA
                     </h1>
                     
-                    <!-- 아래로 스크롤 안내선 (수평 정중앙 완전 일치) -->
+                    <!-- Scroll down indicator line (perfectly centered) -->
                     <div style="position: absolute; bottom: 35px; left: 0; width: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 10;">
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; animation: fadeBob 2s infinite;">
                             <span style="font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; font-family: var(--font-tech); color: var(--text-muted); padding-left: 3px;">Scroll Down</span>
@@ -236,7 +241,7 @@
                     </div>
                 </div>`;
                 
-                // 2. 글1 (단독 화면: min-height: 100vh) - 글1이 화면에 보일 때 아래 그림1은 화면 밖에 위치하여 보이지 않음
+                // 2. Text 1 (Standalone view: min-height 100vh) - When Text 1 is visible, Image 1 is out of the screen
                 htmlStr += `
                 <div class="aph-text-section" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem 2rem; box-sizing: border-box; margin-bottom: 12vh;">
                     <div style="max-width: 1100px; width: 100%; margin: 0 auto; padding: 0 2rem;">
@@ -246,7 +251,7 @@
                     </div>
                 </div>`;
                 
-                // 3. 그림1 (포스터): 글1과 글2가 모두 보이지 않는 독립된 뷰
+                // 3. Image 1 (Poster): Independent view where both Text 1 and Text 2 are not visible
                 htmlStr += '<section class="portfolio-deck" style="padding-top: 0; margin-bottom: 0;">';
                 posters.forEach(art => {
                     htmlStr += `
@@ -261,13 +266,13 @@
                 });
                 htmlStr += '</section>';
                 
-                // 4. 그림1과 글2 사이: 얇고 짧은 선 (스크롤 안내 문구 없음, 충분한 공간 분리)
+                // 4. Between Image 1 and Text 2: A thin and short line (no scroll text, enough separation space)
                 htmlStr += `
                 <div style="min-height: 55vh; display: flex; justify-content: center; align-items: center;">
                     <div style="width: 1px; height: 50px; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.45), rgba(255,255,255,0.05));"></div>
                 </div>`;
                 
-                // 5. 글2: [글1 <-> 그림1] 간격과 100% 동일한 간격 적용 (min-height: 100vh, margin-bottom: 12vh)
+                // 5. Text 2: Same spacing as [Text 1 <-> Image 1] (min-height: 100vh, margin-bottom: 12vh)
                 htmlStr += `
                 <div class="aph-text-section" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem 2rem; box-sizing: border-box; margin-bottom: 12vh;">
                     <div style="max-width: 1100px; width: 100%; margin: 0 auto; padding: 0 2rem;">
@@ -277,7 +282,7 @@
                     </div>
                 </div>`;
                 
-                // 6. 그림2 (조각상)
+                // 6. Image 2 (Statues)
                 htmlStr += '<section class="portfolio-deck" style="padding-top: 0; margin-bottom: 20vh;">';
                 others.forEach(art => {
                     htmlStr += `
@@ -311,6 +316,39 @@
             container.style.opacity = 0;
             container.innerHTML = htmlStr;
             gsap.to(container, { opacity: 1, duration: 1.0, ease: "power2.out" });
+            setTimeout(applyDynamicScrollAnimations, 100);
+        }
+
+        function applyDynamicScrollAnimations() {
+            // Fade out category-hero on scroll (like the main page hero)
+            if(document.querySelector('.category-hero')) {
+                gsap.to('.category-hero', {
+                    scrollTrigger: {
+                        trigger: '.category-hero',
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: true
+                    },
+                    opacity: 0,
+                    y: -50,
+                    pointerEvents: 'none',
+                    overwrite: 'auto'
+                });
+            }
+
+            // Reveal cards and texts as they scroll into view
+            gsap.utils.toArray('.portfolio-card, .aph-text-section').forEach(function(elem) {
+                gsap.set(elem, {autoAlpha: 0, y: 40});
+                ScrollTrigger.create({
+                    trigger: elem, 
+                    start: "top 85%", 
+                    onEnter: function() { 
+                        gsap.to(elem, { duration: 1.2, y: 0, autoAlpha: 1, ease: "power3.out", overwrite: "auto" });
+                    }, 
+                    once: true 
+                });
+            });
+            ScrollTrigger.refresh();
         }
 
         const modal = document.getElementById('project-modal');
