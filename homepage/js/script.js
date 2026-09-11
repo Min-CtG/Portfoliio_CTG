@@ -17,7 +17,7 @@ gsap.ticker.lagSmoothing(0)
 
 // --- GSAP Animations ---
 
-gsap.to(['.hero-content', '.scroll-indicator'], {
+gsap.to(['.hero-content', '.scroll-indicator', '.exhibition-hero', '.category-hero'], {
     scrollTrigger: {
         trigger: 'body',
         start: 'top top',
@@ -73,19 +73,19 @@ let normX = 0;
 let normY = 0;
 
 document.addEventListener('mousemove', (event) => {
-    // 1. 화면 상단 5% 영역(사이드바/네비게이션)에서는 3D 모델 반응 무시
+    // 1. Ignore 3D model interaction in the top 5% area (sidebar/navigation)
     if (event.clientY < window.innerHeight * 0.05) return;
 
     const windowHalfX = window.innerWidth / 2;
     const windowHalfY = window.innerHeight / 2;
     
-    // 기본 정규화 좌표 (-1 ~ 1)
+    // Default normalized coordinates (-1 to 1)
     let rawNormX = (event.clientX / window.innerWidth) * 2 - 1;
     let rawNormY = -(event.clientY / window.innerHeight) * 2 + 1;
     
-    // 2. 거리별 감도 저하 로직 (중앙은 현재 감도 유지, 멀어질수록 둔해짐)
+    // 2. Sensitivity reduction logic based on distance (maintains center sensitivity, dulls as it gets farther)
     let distance = Math.sqrt(rawNormX * rawNormX + rawNormY * rawNormY);
-    // 거리가 1일 때 감도가 약 절반으로 떨어지도록 설정
+    // Set sensitivity to drop by about half when distance is 1
     let falloff = Math.max(0.3, 1.0 - Math.pow(distance * 0.7, 2));
     
     normX = rawNormX * falloff;
@@ -126,8 +126,8 @@ const splatTexture = createSplatTexture();
 if(canvas) {
     const scene = new THREE.Scene();
     
-    // 핵심 최적화 1: 캔버스의 투명 배경(alpha)을 끄고 CSS 배경색과 똑같이 칠함
-    // 브라우저가 투명 캔버스와 HTML을 합성(Compositing)하느라 생기는 엄청난 렉을 원천 차단 (가만히 있어도 렉 걸리는 현상 해결)
+    // Core optimization 1: Turn off transparent background (alpha) and color match CSS background
+    // Prevents massive lag caused by browser compositing transparent canvas with HTML
     scene.background = new THREE.Color('#030508'); 
     
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -136,16 +136,16 @@ if(canvas) {
 
     const renderer = new THREE.WebGLRenderer({ 
         canvas: canvas, 
-        alpha: false, // 투명도를 꺼서 렌더링 속도 2배 향상
+        alpha: false, // Turn off transparency to improve rendering speed by 2x
         antialias: false,
         powerPreference: 'high-performance'
     });
-    // 해상도는 원상복구(뭉개짐 해결)하되, 고해상도 뻥튀기는 방지
+    // Restore resolution (prevent blurriness), but avoid extreme high-res scaling
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // --- WebGL 최적화: 커스텀 글래스 쉐이더 파이프라인 (CPU 개입 0%) ---
-    // RenderTarget은 절반 해상도로 생성하여 GPU 부하를 50% 절감
+    // --- WebGL Optimization: Custom Glass Shader Pipeline (0% CPU involvement) ---
+    // Create RenderTarget at half resolution to save 50% GPU load
     const rtWidth = Math.floor(window.innerWidth * 0.5);
     const rtHeight = Math.floor(window.innerHeight * 0.5);
     const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
@@ -267,10 +267,11 @@ if(canvas) {
             colorsArray[i*3+2] = 0.3 + Math.random() * 0.2; 
         }
 
+        // Parse 3D model data (files are prefetched/cached from the main page for instant loading)
         setTimeout(() => {
             try {
                 const loader = new THREE.OBJLoader();
-                // 페이지에 따라 데이터를 다르게 로드
+                // Load data based on the page
                 const objDataToLoad = isArtworks ? lucyObjData : faceObjData;
                 const object = loader.parse(objDataToLoad);
                 
@@ -285,11 +286,9 @@ if(canvas) {
                         geom = geom.toNonIndexed();
                     }
                     
-                    // Artworks(Lucy/Horse 등) 모델은 Z축이 위로 되어 있어서 정수리가 보이는 문제가 있습니다.
-                    // X축을 기준으로 -90도 회전시켜서 똑바로 서게 만듭니다.
+                    // Fix orientation for Artworks models
                     if (isArtworks) {
                         geom.rotateX(-Math.PI / 2);
-                        // 뒷모습이 보이므로 Y축을 기준으로 180도 회전시켜 정면을 보도록 수정합니다.
                         geom.rotateY(Math.PI);
                     }
 
@@ -302,7 +301,6 @@ if(canvas) {
                     const center = new THREE.Vector3();
                     bb.getCenter(center);
                     
-                    // 천사의 크기를 더 키우기 위해 타겟 사이즈를 45에서 65로 증가
                     const targetSize = isArtworks ? 65 : 45;
                     const scale = targetSize / Math.max(size.x, size.y, size.z);
                     const triCount = pos.length / 9;
@@ -338,7 +336,7 @@ if(canvas) {
             } catch (error) {
                 console.error("OBJ Parse error:", error);
             }
-        }, 100); // UI가 먼저 렌더링되도록 아주 짧은 지연(0.1초) 추가
+        }, 50);
     }
 
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -778,6 +776,10 @@ function createMiniScene(containerId, type = "signal") {
     }, { threshold: 0 });
     observer.observe(container);
 
+    let autoSpinX = 0;
+    let autoSpinY = 0;
+    let autoSpinZ = 0;
+
     function animateMini() {
         requestAnimationFrame(animateMini);
         
@@ -788,17 +790,22 @@ function createMiniScene(containerId, type = "signal") {
         currentRotX += (localTargetX - currentRotX) * 0.05;
         currentRotY += (localTargetY - currentRotY) * 0.05;
 
+        // 360도를 부드럽게 감상할 수 있도록 자동 회전 속도 상향 (가만히 둬도 화면이 돌아감)
+        autoSpinY += 0.005;  // 가로 360도 회전
+        autoSpinX += 0.0015; // 세로 미세 회전
+
         // Base spin (기본 회전) + Mouse rotation (마우스 반응 회전)
         if (type === 'space') {
-            mesh.rotation.y = (Date.now() * 0.0001) + currentRotY;
-            mesh.rotation.x = currentRotX * 0.5 + Math.PI / 5.5; // Steeper angle looking down
+            mesh.rotation.y = autoSpinY * 0.8 + currentRotY;
+            mesh.rotation.x = currentRotX * 0.5 + Math.PI / 5.5; 
         } else if (type === 'artworks') {
-            mesh.rotation.x = (Date.now() * 0.0002) + currentRotX;
-            mesh.rotation.y = (Date.now() * 0.0004) + currentRotY;
-            mesh.rotation.z = (Date.now() * 0.0001);
-        } else {
-            mesh.rotation.x = (Date.now() * 0.0002) + currentRotX;
-            mesh.rotation.y = (Date.now() * 0.0004) + currentRotY;
+            mesh.rotation.x = autoSpinX + currentRotX;
+            mesh.rotation.y = autoSpinY + currentRotY;
+            autoSpinZ += 0.001; 
+            mesh.rotation.z = autoSpinZ; // artworks Z spin
+        } else { // signal
+            mesh.rotation.x = autoSpinX + currentRotX;
+            mesh.rotation.y = autoSpinY + currentRotY;
         }
 
         renderer.render(scene, camera);
