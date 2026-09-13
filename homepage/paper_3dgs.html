@@ -657,10 +657,9 @@
                         if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
                         if(window.setPointDensity) window.setPointDensity(100);
                         if(window.show2DImage) window.show2DImage(false);
-                        if(window.set3DVisible) window.set3DVisible(true);
-                        gsap.to('#bg-canvas', { opacity: 0.05, duration: 0.5 });
+                        gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } });
                         if(window.reset3DScale) window.reset3DScale();
-                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                        document.getElementById('bg-canvas').style.pointerEvents = 'none';
                     }
                 }
             }
