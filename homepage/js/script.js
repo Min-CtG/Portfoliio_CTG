@@ -731,10 +731,12 @@ function createMiniScene(containerId, type = "signal") {
         geometry = generateSpaceGeometry(particlesCount);
     } else if (type === 'artworks') {
         geometry = generateArtworkGeometry(particlesCount);
+    } else if (type === 'study') {
+        geometry = generateStudyGeometry(particlesCount);
     }
 
     const material = new THREE.PointsMaterial({
-        size: type === 'space' ? 1.3 : (type === 'artworks' ? 0.3 : 0.18), 
+        size: type === 'space' ? 1.3 : (type === 'artworks' || type === 'study' ? 0.3 : 0.18), 
         map: splatTexture, 
         alphaTest: 0.01,
         vertexColors: true,
@@ -803,6 +805,11 @@ function createMiniScene(containerId, type = "signal") {
             mesh.rotation.y = autoSpinY + currentRotY;
             autoSpinZ += 0.001; 
             mesh.rotation.z = autoSpinZ; // artworks Z spin
+        } else if (type === 'study') {
+            mesh.rotation.x = autoSpinX * 1.5 + currentRotX;
+            mesh.rotation.y = autoSpinY * 1.2 + currentRotY;
+            autoSpinZ += 0.002;
+            mesh.rotation.z = autoSpinZ;
         } else { // signal
             mesh.rotation.x = autoSpinX + currentRotX;
             mesh.rotation.y = autoSpinY + currentRotY;
@@ -822,10 +829,48 @@ function createMiniScene(containerId, type = "signal") {
     resizeObserver.observe(container);
 }
 
+// Generate Torus Knot for 'study' section
+function generateStudyGeometry() {
+    const count = 3000; // Reduce count significantly for a cleaner wireframe/point look
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    const colorObj = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+        // Torus knot parametric equation
+        const u = Math.random() * Math.PI * 2;
+        const v = Math.random() * Math.PI * 2;
+        const p = 2; // Tube winding
+        const q = 3; // Circle winding
+        
+        // Creating a clean, mathematical torus knot shape
+        const r = 0.9 + 0.35 * Math.cos(q * u);
+        const x = r * Math.cos(p * u) + (Math.random() - 0.5) * 0.15;
+        const y = r * Math.sin(p * u) + (Math.random() - 0.5) * 0.15;
+        const z = 0.35 * Math.sin(q * u) + (Math.random() - 0.5) * 0.15;
+
+        positions[i * 3] = x * 2.5;
+        positions[i * 3 + 1] = y * 2.5;
+        positions[i * 3 + 2] = z * 2.5;
+
+        // Distinct math-like colors (Cyan/Blue/Purple)
+        colorObj.setHSL(0.55 + Math.random() * 0.2, 0.9, 0.4 + Math.random() * 0.3);
+        colors[i * 3] = colorObj.r;
+        colors[i * 3 + 1] = colorObj.g;
+        colors[i * 3 + 2] = colorObj.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return geometry;
+}
+
 window.addEventListener('load', () => {
     createMiniScene('mini-canvas-1', 'signal'); 
     createMiniScene('mini-canvas-2', 'space');  
     createMiniScene('mini-canvas-3', 'artworks');
+    createMiniScene('mini-canvas-4', 'study');
 });
 
 // --- Sidebar Toggle ---

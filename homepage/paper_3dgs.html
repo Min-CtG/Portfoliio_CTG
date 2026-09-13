@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Gaussian Splatting | PPT</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400..800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+            background: var(--bg-color); color: var(--text-color);
+            font-family: var(--font-body);
+        }
+        
+        /* Top Navigation Bar */
+        .top-nav {
+            position: absolute; top: 0; left: 0; width: 100%; height: 8%; min-height: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 3rem; box-sizing: border-box;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
+        }
+        .top-nav-left { display: flex; align-items: center; gap: 2rem; }
+        .back-btn { font-size: 2rem; color: white; cursor: pointer; text-decoration: none; margin-bottom: 5px; }
+        .top-nav-links { display: flex; gap: 3rem; list-style: none; margin: 0; padding: 0; }
+        .top-nav-links a {
+            color: rgba(255,255,255,0.4); text-decoration: none; font-family: var(--font-tech); 
+            font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s;
+        }
+        .top-nav-links a.active, .top-nav-links a:hover { color: var(--primary-color); }
+        
+        /* Layout */
+        #paper-layout {
+            display: flex; width: 100vw; height: 92%; margin-top: 8vh; position: relative; z-index: 2;
+        }
+        .slide-container {
+            width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center;
+        }
+        
+        /* Slides */
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            padding: 4rem; box-sizing: border-box; text-align: center;
+            overflow-y: auto;
+        }
+        .slide.active { opacity: 1; pointer-events: auto; }
+        
+        /* Custom Slide Styles */
+        .title-slide h1 { font-family: var(--font-heading); font-size: clamp(3rem, 5vw, 6rem); letter-spacing: 2px; margin-bottom: 1rem; }
+        .title-slide p { font-family: var(--font-tech); color: var(--primary-color); letter-spacing: 4px; font-size: 1.2rem; line-height: 1.5; }
+        
+        #slide2-img {
+            width: 450px; height: 550px; object-fit: cover; border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: absolute; z-index: 10;
+        }
+        
+        /* PPT PDF Wrapper - Smart Dark Mode */
+        .ppt-pdf-wrapper {
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+            background: transparent !important;
+            /* Invert colors: white bg becomes black, black text becomes white */
+            filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.1);
+            /* Screen mode: Black becomes completely transparent, leaving white text on starry background */
+            mix-blend-mode: screen;
+        }
+        /* Strip the white paper background from pdf2htmlEX structures */
+        .ppt-pdf-wrapper .pf, .ppt-pdf-wrapper .pc, .ppt-pdf-wrapper .c {
+            background-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+        }
+        
+        /* Nav overlay */
+        .slide-controls { position: absolute; bottom: 20px; right: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.3); font-size: 0.8rem; z-index: 100; pointer-events: none;}
+        #page-indicator { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.5); font-size: 1rem; z-index: 100; pointer-events: none; transition: 0.3s;}
+    </style>
+</head>
+<body class="paper-page">
+    
+    <nav class="top-nav">
+        <div class="top-nav-left">
+            <a href="paper.html" class="back-btn">&larr;</a>
+            <ul class="top-nav-links" style="margin-left: 2rem;">
+                <li><a href="#" class="active" id="nav-intro" onclick="goToSlide(0); return false;">3DGAUSSIAN</a></li>
+                <li><a href="#" id="nav-opt" onclick="goToSlide(38); return false;">OPTIMIZATION OF 3DGS</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 3D Canvas Background -->
+    <canvas id="bg-canvas" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; opacity: 0; pointer-events: none;"></canvas>
+
+    <div id="paper-layout">
+        <div class="slide-container" id="slide-container">
+            <!-- Slide 0: Title -->
+            <div class="slide title-slide active" id="slide-0">
+                <h1>3D GAUSSIAN SPLATTING</h1>
+                <p>SURVEY, TECHNOLOGIES, CHALLENGES,<br>AND OPPORTUNITIES</p>
+            </div>
+            
+            <!-- Slide 1, 2, 3: Image to 3D -->
+            <div class="slide" id="slide-1">
+                <img id="slide2-img" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=988&auto=format&fit=crop" alt="Human Face">
+            </div>
+            
+            <!-- Generated PDF contents will be appended here -->
+        </div>
+    </div>
+    
+    <div id="page-indicator">Page <span id="page-num">1</span> / <span id="page-count">?</span></div>
+    <div class="slide-controls">LEFT CLICK / ARROW KEYS TO NAVIGATE</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="data/faceData.js"></script>
+    <script src="data/paperHtmlData.js" charset="utf-8"></script>
+    <script>
+        // ==========================================
+        // Load pdf2htmlEX Slides Dynamically
+        // ==========================================
+        const container = document.getElementById('slide-container');
+        let maxStep = 3;
+
+        if (typeof paperHtmlString !== 'undefined') {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(paperHtmlString, 'text/html');
+            
+            // 1. Inject Styles BEFORE our main styles so our overrides win
+            const styles = doc.querySelectorAll('style');
+            const firstScript = document.head.querySelector('script');
+            styles.forEach(style => {
+                // Prepend or insert before scripts to ensure our main <style> in <head> takes precedence
+                document.head.insertBefore(style.cloneNode(true), document.head.firstChild);
+            });
+            
+            // 2. Extract and Inject Slides
+            const pages = doc.querySelectorAll('.pf');
+            const numSlides = pages.length;
+            
+            pages.forEach((page, i) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide';
+                slideDiv.id = `slide-${i + 4}`; // 0, 1, 2, 3 are custom intro
+                
+                const wrapperDiv = document.createElement('div');
+                wrapperDiv.className = 'ppt-pdf-wrapper';
+                
+                wrapperDiv.appendChild(page.cloneNode(true));
+                slideDiv.appendChild(wrapperDiv);
+                container.appendChild(slideDiv);
+            });
+            
+            document.getElementById('page-count').textContent = numSlides + 3;
+            maxStep = numSlides + 3;
+
+            // Adjust scale on load and resize
+            function resizePages() {
+                const wrappers = document.querySelectorAll('.ppt-pdf-wrapper');
+                wrappers.forEach(wrapper => {
+                    const pf = wrapper.querySelector('.pf');
+                    if(pf) {
+                        const origW = parseFloat(pf.style.width) || 1200;
+                        const origH = parseFloat(pf.style.height) || 675;
+                        
+                        const maxW = window.innerWidth * 0.90;
+                        const maxH = window.innerHeight * 0.85;
+                        const scale = Math.min(maxW / origW, maxH / origH);
+                        
+                        pf.style.transform = `scale(${scale})`;
+                        pf.style.transformOrigin = 'top left';
+                        
+                        // Explicitly size the wrapper to match the scaled PDF
+                        wrapper.style.width = `${origW * scale}px`;
+                        wrapper.style.height = `${origH * scale}px`;
+                    }
+                });
+            }
+            window.addEventListener('resize', resizePages);
+            setTimeout(resizePages, 100);
+        } else {
+            console.error("Failed to load paper HTML data.");
+        }
+
+        // ==========================================
+        // PPT Slide Logic
+        // ==========================================
+        let currentStep = 0;
+        
+        function goToSlide(n) {
+            currentStep = n;
+            updateSlide();
+        }
+        
+        function updateSlide() {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById('page-num').textContent = currentStep + 1;
+            
+            // Nav Highlighting
+            document.querySelectorAll('.top-nav-links a').forEach(a => a.classList.remove('active'));
+            if(currentStep < 38) document.getElementById('nav-intro').classList.add('active');
+            else document.getElementById('nav-opt').classList.add('active');
+
+            if (currentStep === 0) {
+                document.getElementById('slide-0').classList.add('active');
+                gsap.to('#bg-canvas', { opacity: 0, duration: 0.5 });
+            } 
+            else if (currentStep === 1) {
+                document.getElementById('slide-1').classList.add('active');
+                gsap.to('#slide2-img', { opacity: 1, duration: 0.5 });
+                gsap.to('#bg-canvas', { opacity: 0, duration: 0.5 });
+                if(window.reset3DScale) window.reset3DScale();
+                document.getElementById('bg-canvas').style.pointerEvents = 'none';
+            }
+            else if (currentStep === 2) {
+                document.getElementById('slide-1').classList.add('active');
+                gsap.to('#slide2-img', { opacity: 0, duration: 0.8 });
+                gsap.to('#bg-canvas', { opacity: 1, duration: 0.8 });
+                if(window.reset3DScale) window.reset3DScale();
+                document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+            }
+            else if (currentStep === 3) {
+                document.getElementById('slide-1').classList.add('active');
+                if(window.scaleUp3D) window.scaleUp3D();
+                gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+            }
+            else if (currentStep > 3) {
+                const targetSlide = document.getElementById(`slide-${currentStep}`);
+                if(targetSlide) targetSlide.classList.add('active');
+                
+                // Keep the 3D background visible but very dim for readability
+                gsap.to('#bg-canvas', { opacity: 0.05, duration: 0.5 });
+                document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+            }
+        }
+
+        function advanceSlide() {
+            if (currentStep < maxStep) { currentStep++; updateSlide(); }
+        }
+
+        function previousSlide() {
+            if (currentStep > 0) { currentStep--; updateSlide(); }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                advanceSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                previousSlide();
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.closest('a') || e.target.closest('.top-nav')) return;
+            if (e.button === 0) advanceSlide();
+        });
+        
+        window.addEventListener('contextmenu', (e) => {
+            if (e.target.closest('a') || e.target.closest('.top-nav')) return;
+            e.preventDefault();
+            previousSlide();
+        });
+
+        // ==========================================
+        // Custom 3D Script for Paper Page
+        // ==========================================
+        const canvas = document.getElementById('bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.z = 120;
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 20000;
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorsArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount; i++) {
+            posArray[i*3] = (Math.random() - 0.5) * 120;
+            posArray[i*3+1] = (Math.random() - 0.5) * 120;
+            posArray[i*3+2] = (Math.random() - 0.5) * 120;
+            colorsArray[i*3] = 0.2; colorsArray[i*3+1] = 0.2; colorsArray[i*3+2] = 0.3; 
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+        const canvasTexture = document.createElement('canvas');
+        canvasTexture.width = 32; canvasTexture.height = 32;
+        const context = canvasTexture.getContext('2d');
+        const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        context.fillStyle = gradient;
+        context.fillRect(0,0,32,32);
+        const splatTexture = new THREE.CanvasTexture(canvasTexture);
+
+        const material = new THREE.PointsMaterial({
+            size: 0.55, 
+            map: splatTexture, 
+            alphaTest: 0.01,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.9,
+            depthWrite: false
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+
+        setTimeout(() => {
+            try {
+                const loader = new THREE.OBJLoader();
+                const object = loader.parse(faceObjData);
+                let mesh;
+                object.traverse((child) => { if (child.isMesh && !mesh) mesh = child; });
+                
+                if (mesh) {
+                    let geom = mesh.geometry;
+                    if (geom.index) geom = geom.toNonIndexed();
+                    
+                    const pos = geom.attributes.position.array;
+                    
+                    geom.computeBoundingBox();
+                    const bb = geom.boundingBox;
+                    const size = new THREE.Vector3();
+                    bb.getSize(size);
+                    const center = new THREE.Vector3();
+                    bb.getCenter(center);
+
+                    const scale = 50 / Math.max(size.x, size.y, size.z);
+                    const triCount = pos.length / 9;
+                    const currentPos = particlesGeometry.attributes.position.array;
+                    const currentCol = particlesGeometry.attributes.color.array;
+
+                    for(let i = 0; i < particlesCount; i++) {
+                        const triIndex = Math.floor(Math.random() * triCount) * 9;
+                        
+                        let r1 = Math.random();
+                        let r2 = Math.random();
+                        if(r1 + r2 > 1) { r1 = 1 - r1; r2 = 1 - r2; }
+                        const r3 = 1 - r1 - r2;
+                        
+                        const px = pos[triIndex] * r1 + pos[triIndex+3] * r2 + pos[triIndex+6] * r3;
+                        const py = pos[triIndex+1] * r1 + pos[triIndex+4] * r2 + pos[triIndex+7] * r3;
+                        const pz = pos[triIndex+2] * r1 + pos[triIndex+5] * r2 + pos[triIndex+8] * r3;
+                        
+                        const tx = (px - center.x) * scale;
+                        const ty = (py - center.y) * scale - 5;
+                        const tz = (pz - center.z) * scale;
+                        
+                        currentPos[i*3] = tx;
+                        currentPos[i*3+1] = ty;
+                        currentPos[i*3+2] = tz;
+                        
+                        currentCol[i*3] = 0.5 + (tx / 30);
+                        currentCol[i*3+1] = 0.6 + (ty / 30);
+                        currentCol[i*3+2] = 0.9 + (tz / 20);
+                    }
+
+                    particlesGeometry.attributes.position.needsUpdate = true;
+                    particlesGeometry.attributes.color.needsUpdate = true;
+                }
+            } catch(e) { console.error(e); }
+        }, 500);
+
+        let mouseX = 0, mouseY = 0;
+        
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        window.scaleUp3D = function() {
+            gsap.to(particlesMesh.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 0.8, ease: "power2.out" });
+        };
+        window.reset3DScale = function() {
+            gsap.to(particlesMesh.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.6, ease: "power2.out" });
+        };
+
+        const clock = new THREE.Clock();
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let autoRotY = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (currentStep >= 2) {
+                autoRotY += 0.005;
+            }
+            
+            targetRotationY = (mouseX * 0.8) + autoRotY;
+            targetRotationX = -mouseY * 0.8;
+            
+            particlesMesh.rotation.y += (targetRotationY - particlesMesh.rotation.y) * 0.05;
+            particlesMesh.rotation.x += (targetRotationX - particlesMesh.rotation.x) * 0.05;
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize
+        document.getElementById('page-count').textContent = maxStep + 1;
+    </script>
+</body>
+</html>
