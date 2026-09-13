@@ -36,6 +36,10 @@
         /* Layout */
         #paper-layout {
             display: flex; width: 100vw; height: 92%; margin-top: 8vh; position: relative; z-index: 2;
+            transition: margin-top 0.3s ease, height 0.3s ease;
+        }
+        #paper-layout.with-subnav {
+            margin-top: 13vh; height: 87%;
         }
         .slide-container {
             width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center;
@@ -72,6 +76,229 @@
         /* Nav overlay */
         .slide-controls { position: absolute; bottom: 20px; right: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.3); font-size: 0.8rem; z-index: 100; pointer-events: none;}
         #page-indicator { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.5); font-size: 1rem; z-index: 100; pointer-events: none; transition: 0.3s;}
+        
+        /* Missing PPT CSS */
+        .content-slide h2 { 
+            font-family: var(--font-heading);
+            font-size: 2.2rem; 
+            margin-bottom: 1.5rem; 
+            color: #ffffff; 
+            letter-spacing: 1px; 
+        }
+        .content-slide h3 {
+            font-family: var(--font-tech);
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .info-box {
+            background: rgba(25, 25, 30, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            width: 90%; max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* LIGHT MODE STYLES */
+        body.light-mode {
+            background: #f4f6f9; /* Softer off-white to help 3D points pop */
+            color: #1a1a1a;
+        }
+        body.light-mode .top-nav {
+            background: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        body.light-mode .top-nav-links a {
+            color: rgba(0,0,0,0.5);
+        }
+        body.light-mode .top-nav-links a.active, 
+        body.light-mode .top-nav-links a:hover {
+            color: #0077ff;
+        }
+        body.light-mode .back-btn {
+            color: #1a1a1a;
+        }
+        body.light-mode .sub-nav {
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        body.light-mode .sub-nav-links a {
+            color: rgba(0,0,0,0.6);
+        }
+        body.light-mode .sub-nav-links a.active, 
+        body.light-mode .sub-nav-links a:hover {
+            color: #0077ff;
+        }
+        body.light-mode .info-box {
+            background: rgba(220, 240, 255, 0.8); /* Light sky-blue */
+            border: 1px solid rgba(0, 120, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        body.light-mode .content-slide h2 {
+            color: #1a1a1a;
+        }
+        body.light-mode .info-box h3 {
+            color: #0055cc;
+        }
+        body.light-mode .info-box p {
+            color: #333333;
+        }
+        body.light-mode .info-box p strong {
+            color: #0077ff;
+            font-weight: bold;
+        }
+        body.light-mode .info-box th, 
+        body.light-mode .info-box td {
+            color: #333333;
+            border-color: rgba(0,0,0,0.1);
+        }
+        body.light-mode .info-box th {
+            background: rgba(0, 120, 255, 0.1);
+            color: #0077ff;
+        }
+        body.light-mode .info-box tr:nth-child(even) {
+            background: rgba(0,0,0,0.02);
+        }
+        body.light-mode .info-box td strong {
+            color: #000;
+        }
+        body.light-mode .title-slide h1 {
+            color: #1a1a1a;
+        }
+        body.light-mode .title-slide p {
+            color: #0077ff;
+        }
+        body.light-mode .lang-btn {
+            color: rgba(0,0,0,0.6);
+            border-color: rgba(0,0,0,0.2);
+        }
+        body.light-mode .lang-btn:hover,
+        body.light-mode .lang-btn.active {
+            color: #0077ff;
+            border-color: #0077ff;
+        }
+        body.light-mode #slide-16 h2, 
+        body.light-mode #slide-18 h2, 
+        body.light-mode #slide-40 h2, 
+        body.light-mode #slide-46 h2, 
+        body.light-mode #slide-51 h2 {
+            color: #0077ff !important;
+        }
+        body.light-mode .theme-btn {
+            color: rgba(0,0,0,0.6);
+            border-color: rgba(0,0,0,0.2);
+        }
+        body.light-mode .theme-btn:hover {
+            color: #0077ff;
+            border-color: #0077ff;
+        }
+        body.light-mode .slide-controls,
+        body.light-mode #page-indicator {
+            color: rgba(0,0,0,0.6);
+        }
+
+        .info-box p { font-size: 1.1rem; line-height: 1.7; color: #d0d0d0; margin-bottom: 1rem; }
+        .info-box p strong { color: var(--primary-color); font-weight: normal; }
+
+        /* Slide 12 (Mid-presentation Title) */
+        #slide-12 h2 {
+            font-size: clamp(2.5rem, 4vw, 4.5rem);
+            margin-bottom: 0.5rem;
+        }
+        #slide-12 h3 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: var(--primary-color);
+        }
+
+        .slide[data-special="show5Percent"] h2,
+        .slide[data-special="show5Percent"] .info-box,
+        .slide[data-special="show30Percent"] h2,
+        .slide[data-special="show30Percent"] .info-box,
+        .slide[data-special="show150Percent"] h2,
+        .slide[data-special="show150Percent"] .info-box,
+        .slide[data-special="show2DImage"] h2,
+        .slide[data-special="show2DImage"] .info-box,
+        .slide[data-special="voxelGrid"] h2,
+        .slide[data-special="voxelGrid"] .info-box,
+        .slide[data-special="anchorPoints"] h2,
+        .slide[data-special="anchorPoints"] .info-box {
+            display: none !important;
+        }
+
+        .slide[data-special="fourBoxes"] {
+            max-width: 95vw !important;
+            width: 95vw !important;
+        }
+        
+        .slide[data-special="fourBoxes"] .info-box {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Table styles for Methodology Comparison */
+        .info-box table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        .info-box th, .info-box td { border: 1px solid rgba(255,255,255,0.15); padding: 12px 15px; text-align: left; font-size: 1rem; color: #d0d0d0; }
+        .info-box th { background: rgba(0, 255, 204, 0.1); color: var(--primary-color); font-weight: bold; font-family: var(--font-tech); letter-spacing: 1px; }
+        .info-box tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+        .info-box td strong { color: #fff; font-weight: bold; }
+
+        /* Sub Navigation Bar */
+        .sub-nav {
+            position: absolute; top: 8%; left: 0; width: 100%; height: 5%; min-height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 99;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .sub-nav.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .sub-nav-links { display: flex; gap: 3rem; list-style: none; margin: 0; padding: 0; }
+        .sub-nav-links a {
+            color: rgba(255,255,255,0.5); text-decoration: none; font-family: var(--font-tech); 
+            font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s;
+        }
+        .sub-nav-links a:hover { color: var(--primary-color); }
+        .sub-nav-links a.active { color: #ffffff; font-weight: bold; }
+        /* Section Titles */
+        #slide-16 h2, #slide-18 h2, #slide-40 h2, #slide-46 h2, #slide-51 h2 {
+            font-size: 3.5rem !important;
+            margin-bottom: 2.5rem !important;
+            color: var(--primary-color) !important;
+            letter-spacing: 2px !important;
+        }
+        
+        /* Language Buttons */
+        .top-nav-right {
+            display: flex; gap: 1rem;
+        }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: rgba(255,255,255,0.7);
+            font-family: var(--font-tech);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
     </style>
 </head>
 <body class="paper-page">
@@ -81,9 +308,24 @@
             <a href="paper.html" class="back-btn">&larr;</a>
             <ul class="top-nav-links" style="margin-left: 2rem;">
                 <li><a href="#" class="active" id="nav-intro" onclick="goToSlide(0); return false;">3DGAUSSIAN</a></li>
-                <li><a href="#" id="nav-opt" onclick="goToSlide(38); return false;">OPTIMIZATION OF 3DGS</a></li>
+                <li><a href="#" id="nav-survey" onclick="goToSlide(12); return false;">SURVEY</a></li>
+                <li><a href="#" id="nav-opt" onclick="goToSlide(16); return false;">OPTIMIZATION OF 3DGS</a></li>
             </ul>
         </div>
+        <div class="top-nav-right">
+            <button class="lang-btn theme-btn" onclick="toggleTheme()" id="theme-toggle">🌙</button>
+            <button class="lang-btn active" onclick="setLanguage('KR')">KR</button>
+            <button class="lang-btn" onclick="setLanguage('EN')">EN</button>
+        </div>
+    </nav>
+
+    <nav class="sub-nav">
+        <ul class="sub-nav-links">
+            <li><a href="#" id="sub-eff" onclick="goToSlide(18); return false;">효율성 (Efficiency)</a></li>
+            <li><a href="#" id="sub-photo" onclick="goToSlide(40); return false;">사실성 (Photorealism)</a></li>
+            <li><a href="#" id="sub-gen" onclick="goToSlide(46); return false;">일반화 (Generalizable)</a></li>
+            <li><a href="#" id="sub-sparse" onclick="goToSlide(51); return false;">희소 뷰 (Sparse Views)</a></li>
+        </ul>
     </nav>
 
     <!-- 3D Canvas Background -->
@@ -99,7 +341,7 @@
             
             <!-- Slide 1, 2, 3: Image to 3D -->
             <div class="slide" id="slide-1">
-                <img id="slide2-img" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=988&auto=format&fit=crop" alt="Human Face">
+                <img id="slide2-img" src="assets/ai_woman_face.jpg" alt="Human Face">
             </div>
             
             <!-- Generated PDF contents will be appended here -->
@@ -113,73 +355,136 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="data/faceData.js"></script>
-    <script src="data/paperHtmlData.js" charset="utf-8"></script>
+    <script src="data/clean_slides.js?v=2"></script>
+    <script src="data/clean_slides_en.js?v=4"></script>
     <script>
-        // ==========================================
-        // Load pdf2htmlEX Slides Dynamically
-        // ==========================================
-        const container = document.getElementById('slide-container');
-        let maxStep = 3;
-
-        if (typeof paperHtmlString !== 'undefined') {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(paperHtmlString, 'text/html');
+        // Theme logic
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
             
-            // 1. Inject Styles BEFORE our main styles so our overrides win
-            const styles = doc.querySelectorAll('style');
-            const firstScript = document.head.querySelector('script');
-            styles.forEach(style => {
-                // Prepend or insert before scripts to ensure our main <style> in <head> takes precedence
-                document.head.insertBefore(style.cloneNode(true), document.head.firstChild);
-            });
-            
-            // 2. Extract and Inject Slides
-            const pages = doc.querySelectorAll('.pf');
-            const numSlides = pages.length;
-            
-            pages.forEach((page, i) => {
-                const slideDiv = document.createElement('div');
-                slideDiv.className = 'slide';
-                slideDiv.id = `slide-${i + 4}`; // 0, 1, 2, 3 are custom intro
-                
-                const wrapperDiv = document.createElement('div');
-                wrapperDiv.className = 'ppt-pdf-wrapper';
-                
-                wrapperDiv.appendChild(page.cloneNode(true));
-                slideDiv.appendChild(wrapperDiv);
-                container.appendChild(slideDiv);
-            });
-            
-            document.getElementById('page-count').textContent = numSlides + 3;
-            maxStep = numSlides + 3;
-
-            // Adjust scale on load and resize
-            function resizePages() {
-                const wrappers = document.querySelectorAll('.ppt-pdf-wrapper');
-                wrappers.forEach(wrapper => {
-                    const pf = wrapper.querySelector('.pf');
-                    if(pf) {
-                        const origW = parseFloat(pf.style.width) || 1200;
-                        const origH = parseFloat(pf.style.height) || 675;
-                        
-                        const maxW = window.innerWidth * 0.90;
-                        const maxH = window.innerHeight * 0.85;
-                        const scale = Math.min(maxW / origW, maxH / origH);
-                        
-                        pf.style.transform = `scale(${scale})`;
-                        pf.style.transformOrigin = 'top left';
-                        
-                        // Explicitly size the wrapper to match the scaled PDF
-                        wrapper.style.width = `${origW * scale}px`;
-                        wrapper.style.height = `${origH * scale}px`;
-                    }
-                });
+            const toggleBtn = document.getElementById('theme-toggle');
+            if (isLight) {
+                toggleBtn.textContent = '☀️';
+            } else {
+                toggleBtn.textContent = '🌙';
             }
-            window.addEventListener('resize', resizePages);
-            setTimeout(resizePages, 100);
-        } else {
-            console.error("Failed to load paper HTML data.");
+            
+            // Improve 3D points visibility in light mode
+            if (typeof material !== 'undefined') {
+                material.color.setHex(isLight ? 0x4a4a4a : 0xffffff); // Darken colors more appropriately
+                material.size = isLight ? 0.75 : 0.55; // Make points slightly larger in light mode to look more solid
+                material.needsUpdate = true;
+            }
         }
+
+        // Language state
+        let currentLang = 'KR';
+        let currentSlidesData = cleanGeneratedSlides; // Default to KR
+
+        function setLanguage(lang) {
+            if (lang === currentLang) return;
+            currentLang = lang;
+            
+            // Update buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.textContent === lang) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+            
+            // Update hardcoded nav texts
+            if (lang === 'EN') {
+                document.getElementById('sub-eff').textContent = 'Efficiency';
+                document.getElementById('sub-photo').textContent = 'Photorealism';
+                document.getElementById('sub-gen').textContent = 'Generalizable';
+                document.getElementById('sub-sparse').textContent = 'Sparse Views';
+            } else {
+                document.getElementById('sub-eff').textContent = '효율성 (Efficiency)';
+                document.getElementById('sub-photo').textContent = '사실성 (Photorealism)';
+                document.getElementById('sub-gen').textContent = '일반화 (Generalizable)';
+                document.getElementById('sub-sparse').textContent = '희소 뷰 (Sparse Views)';
+            }
+            
+            // Update data source
+            currentSlidesData = lang === 'EN' ? window.cleanGeneratedSlidesEn : cleanGeneratedSlides;
+            
+            // Re-render slides
+            initGeneratedSlides();
+            updateSlide(); // refresh current slide
+        }
+
+        // ==========================================
+        // Inject Generated Presentation Slides
+        // ==========================================
+        let maxStep = 3; 
+
+        function initGeneratedSlides() {
+            const container = document.getElementById('slide-container');
+            
+            // Remove previously generated slides
+            document.querySelectorAll('.generated-slide').forEach(el => el.remove());
+
+            // Append starting from slide-4
+            let startIdx = 0; 
+            for (let i = startIdx; i < currentSlidesData.length; i++) {
+                const slideData = currentSlidesData[i];
+                const currentSlideNum = i - startIdx + 4;
+                
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide content-slide generated-slide';
+                slideDiv.id = `slide-${currentSlideNum}`;
+                
+                if (slideData.isSpecial3D) {
+                    slideDiv.setAttribute('data-special', slideData.isSpecial3D);
+                }
+                
+                const h2 = document.createElement('h2');
+                h2.textContent = slideData.title;
+                slideDiv.appendChild(h2);
+
+                if (slideData.subtitle) {
+                    const h3 = document.createElement('h3');
+                    h3.textContent = slideData.subtitle;
+                    slideDiv.appendChild(h3);
+                }
+                
+                if (slideData.body && slideData.body.length > 0) {
+                    const infoBox = document.createElement('div');
+                    infoBox.className = 'info-box';
+                    
+                    const isHtml = slideData.body.some(line => line.trim().startsWith('<'));
+                    if (isHtml) {
+                        const wrapper = document.createElement('div');
+                        wrapper.innerHTML = slideData.body.join(' ');
+                        while (wrapper.firstChild) {
+                            infoBox.appendChild(wrapper.firstChild);
+                        }
+                    } else {
+                        slideData.body.forEach(lineText => {
+                            const p = document.createElement('p');
+                            if (lineText.startsWith('-')) {
+                                const parts = lineText.substring(1).split(':');
+                                if (parts.length > 1) {
+                                    p.innerHTML = `<strong>- ${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}`;
+                                } else {
+                                    p.textContent = `- ${lineText.substring(1).trim()}`;
+                                }
+                            } else {
+                                p.textContent = lineText;
+                            }
+                            infoBox.appendChild(p);
+                        });
+                    }
+                    slideDiv.appendChild(infoBox);
+                }
+                container.appendChild(slideDiv);
+            }
+            maxStep = 3 + (currentSlidesData.length - startIdx);
+            document.getElementById('page-count').textContent = maxStep + 1;
+        }
+
+        // Initialize slides on first load
+        initGeneratedSlides();
 
         // ==========================================
         // PPT Slide Logic
@@ -196,43 +501,139 @@
             document.getElementById('page-num').textContent = currentStep + 1;
             
             // Nav Highlighting
-            document.querySelectorAll('.top-nav-links a').forEach(a => a.classList.remove('active'));
-            if(currentStep < 38) document.getElementById('nav-intro').classList.add('active');
-            else document.getElementById('nav-opt').classList.add('active');
+            document.querySelectorAll('.top-nav-links a, .sub-nav-links a').forEach(a => a.classList.remove('active'));
+            if(currentStep < 12) {
+                document.getElementById('nav-intro').classList.add('active');
+            } else if (currentStep >= 12 && currentStep < 16) {
+                document.getElementById('nav-survey').classList.add('active');
+            } else {
+                document.getElementById('nav-opt').classList.add('active');
+            }
+
+            // Sub-nav Visibility Logic
+            const subNav = document.querySelector('.sub-nav');
+            const paperLayout = document.getElementById('paper-layout');
+            if (currentStep >= 16) {
+                subNav.classList.add('active');
+                paperLayout.classList.add('with-subnav');
+                
+                // Sub-nav Highlights
+                if (currentStep >= 51) {
+                    document.getElementById('sub-sparse').classList.add('active');
+                } else if (currentStep >= 46) {
+                    document.getElementById('sub-gen').classList.add('active');
+                } else if (currentStep >= 40) {
+                    document.getElementById('sub-photo').classList.add('active');
+                } else if (currentStep >= 18) {
+                    document.getElementById('sub-eff').classList.add('active');
+                }
+            } else {
+                subNav.classList.remove('active');
+                paperLayout.classList.remove('with-subnav');
+            }
 
             if (currentStep === 0) {
                 document.getElementById('slide-0').classList.add('active');
-                gsap.to('#bg-canvas', { opacity: 0, duration: 0.5 });
+                gsap.to('#slide2-img', { opacity: 0, duration: 0.5 });
+                gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } });
+                document.getElementById('bg-canvas').style.pointerEvents = 'none';
             } 
             else if (currentStep === 1) {
                 document.getElementById('slide-1').classList.add('active');
                 gsap.to('#slide2-img', { opacity: 1, duration: 0.5 });
-                gsap.to('#bg-canvas', { opacity: 0, duration: 0.5 });
+                gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } }); 
                 if(window.reset3DScale) window.reset3DScale();
+                if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
                 document.getElementById('bg-canvas').style.pointerEvents = 'none';
             }
             else if (currentStep === 2) {
                 document.getElementById('slide-1').classList.add('active');
                 gsap.to('#slide2-img', { opacity: 0, duration: 0.8 });
-                gsap.to('#bg-canvas', { opacity: 1, duration: 0.8 });
+                if(window.set3DVisible) window.set3DVisible(true);
+                gsap.to('#bg-canvas', { opacity: 0.8, duration: 0.8 }); 
                 if(window.reset3DScale) window.reset3DScale();
+                if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
                 document.getElementById('bg-canvas').style.pointerEvents = 'auto';
             }
             else if (currentStep === 3) {
                 document.getElementById('slide-1').classList.add('active');
-                if(window.scaleUp3D) window.scaleUp3D();
-                gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                if(window.scaleUp3D) window.scaleUp3D(); 
+                if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+                if(window.set3DVisible) window.set3DVisible(true);
+                if(window.set3DVisible) window.set3DVisible(true);
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
                 document.getElementById('bg-canvas').style.pointerEvents = 'auto';
             }
             else if (currentStep > 3) {
                 const targetSlide = document.getElementById(`slide-${currentStep}`);
-                if(targetSlide) targetSlide.classList.add('active');
-                
-                // Keep the 3D background visible but very dim for readability
-                gsap.to('#bg-canvas', { opacity: 0.05, duration: 0.5 });
-                document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                if(targetSlide) {
+                    targetSlide.classList.add('active');
+                    const special = targetSlide.getAttribute('data-special');
+                    
+                    if (special === 'voxelGrid') {
+                        if(window.scaleUp3D) window.scaleUp3D();
+                        if(window.showVoxels) window.showVoxels();
+                        if(window.set3DVisible) window.set3DVisible(true);
+                if(window.set3DVisible) window.set3DVisible(true);
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                    } else if (special === 'anchorPoints') {
+                        if(window.scaleUp3D) window.scaleUp3D();
+                        if(window.showAnchors) window.showAnchors();
+                        if(window.set3DVisible) window.set3DVisible(true);
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                    } else if (special === 'show5Percent') {
+                        window.isAutoRotating = true;
+                        if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+                        if(window.reset3DScale) window.reset3DScale();
+                        if(window.set3DVisible) window.set3DVisible(true);
+                        if(window.setPointDensity) window.setPointDensity(5);
+                        if(window.show2DImage) window.show2DImage(false);
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                    } else if (special === 'show30Percent') {
+                        window.isAutoRotating = true;
+                        if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+                        if(window.reset3DScale) window.reset3DScale();
+                        if(window.set3DVisible) window.set3DVisible(true);
+                        if(window.setPointDensity) window.setPointDensity(30);
+                        if(window.show2DImage) window.show2DImage(false);
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                    } else if (special === 'show150Percent') {
+                        if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+                        if(window.reset3DScale) window.reset3DScale();
+                        if(window.set3DVisible) window.set3DVisible(true);
+                        if(window.setPointDensity) window.setPointDensity(150);
+                        if(window.show2DImage) window.show2DImage(false);
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                        window.isAutoRotating = false;
+                        if (typeof faceGroup !== 'undefined') {
+                            gsap.to(faceGroup.rotation, { y: 0, duration: 1.5, ease: "power2.out" });
+                            autoRotY = 0;
+                        }
+                    } else if (special === 'show2DImage') {
+                        document.getElementById('slide-1').classList.add('active');
+                        if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+                        gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } });
+                        if(window.show2DImage) window.show2DImage(true);
+                        document.getElementById('bg-canvas').style.pointerEvents = 'none';
+                    } else {
+                        // Regular text slide
+                        if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+                        if(window.setPointDensity) window.setPointDensity(100);
+                        if(window.show2DImage) window.show2DImage(false);
+                        if(window.set3DVisible) window.set3DVisible(true);
+                        gsap.to('#bg-canvas', { opacity: 0.05, duration: 0.5 });
+                        if(window.reset3DScale) window.reset3DScale();
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+                    }
+                }
             }
         }
+
 
         function advanceSlide() {
             if (currentStep < maxStep) { currentStep++; updateSlide(); }
@@ -243,7 +644,7 @@
         }
 
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'Enter') {
                 advanceSlide();
             } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
                 previousSlide();
@@ -274,7 +675,7 @@
         camera.position.z = 120;
 
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 20000;
+        const particlesCount = 18000;
         const posArray = new Float32Array(particlesCount * 3);
         const colorsArray = new Float32Array(particlesCount * 3);
 
@@ -308,7 +709,17 @@
         });
 
         const particlesMesh = new THREE.Points(particlesGeometry, material);
-        scene.add(particlesMesh);
+        const faceGroup = new THREE.Group();
+        faceGroup.add(particlesMesh);
+        
+        const voxelsGroup = new THREE.Group();
+        const anchorsGroup = new THREE.Group();
+        faceGroup.add(voxelsGroup);
+        faceGroup.add(anchorsGroup);
+        
+        scene.add(faceGroup);
+        
+        let originalCols = new Float32Array(particlesCount * 3);
 
         setTimeout(() => {
             try {
@@ -362,6 +773,10 @@
 
                     particlesGeometry.attributes.position.needsUpdate = true;
                     particlesGeometry.attributes.color.needsUpdate = true;
+                    // Save original colors for restoring
+                    for(let i=0; i<particlesCount*3; i++) {
+                        originalCols[i] = currentCol[i];
+                    }
                 }
             } catch(e) { console.error(e); }
         }, 500);
@@ -373,11 +788,158 @@
             mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
         });
 
+        
+        window.activeVoxelsSet = new Set();
+        let isVoxelsGenerated = false;
+        let isAnchorsGenerated = false;
+        
+        window.showVoxels = function() {
+            // Restore colors
+            if (originalCols[0] !== undefined && originalCols[0] !== 0) {
+                const cols = particlesGeometry.attributes.color.array;
+                for(let i=0; i<particlesCount*3; i++) cols[i] = originalCols[i];
+                particlesGeometry.attributes.color.needsUpdate = true;
+            }
+            
+            // Hide anchors if coming backwards
+            anchorsGroup.children.forEach(child => {
+                gsap.killTweensOf(child.material);
+                gsap.to(child.material, {opacity: 0, duration: 0.5});
+            });
+
+            if (!isVoxelsGenerated) {
+                const pos = particlesGeometry.attributes.position.array;
+                const voxelSize = 4.5;
+                
+                for (let i = 0; i < particlesCount; i++) {
+                    const px = pos[i*3];
+                    const py = pos[i*3+1];
+                    const pz = pos[i*3+2];
+                    
+                    const vx = Math.floor(px / voxelSize) * voxelSize + (voxelSize/2);
+                    const vy = Math.floor(py / voxelSize) * voxelSize + (voxelSize/2);
+                    const vz = Math.floor(pz / voxelSize) * voxelSize + (voxelSize/2);
+                    
+                    window.activeVoxelsSet.add(vx.toFixed(2) + ',' + vy.toFixed(2) + ',' + vz.toFixed(2));
+                }
+                
+                const boxGeo = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
+                const boxMat = new THREE.LineBasicMaterial({ color: 0x4488aa, transparent: true, opacity: 0 });
+                const edges = new THREE.EdgesGeometry(boxGeo);
+                
+                window.activeVoxelsSet.forEach(key => {
+                    const [x, y, z] = key.split(',').map(Number);
+                    const line = new THREE.LineSegments(edges, boxMat.clone());
+                    line.position.set(x, y, z);
+                    voxelsGroup.add(line);
+                });
+                isVoxelsGenerated = true;
+            }
+            
+            voxelsGroup.children.forEach(child => {
+                gsap.killTweensOf(child.material);
+                gsap.to(child.material, {opacity: 0.12, duration: 1});
+            });
+        };
+
+        window.showAnchors = function() {
+            if (!isVoxelsGenerated) {
+                window.showVoxels();
+            } else {
+                voxelsGroup.children.forEach(child => {
+                    gsap.killTweensOf(child.material);
+                    gsap.to(child.material, {opacity: 0.12, duration: 1});
+                });
+            }
+            
+            // Darken points
+            const cols = particlesGeometry.attributes.color.array;
+            for(let i=0; i<particlesCount*3; i++) {
+                cols[i] = originalCols[i] * 0.15;
+            }
+            particlesGeometry.attributes.color.needsUpdate = true;
+            
+            if (!isAnchorsGenerated) {
+                const anchorGeo = new THREE.SphereGeometry(0.5, 16, 16);
+                const anchorMat = new THREE.MeshBasicMaterial({ color: 0xdd5555, transparent: true, opacity: 0 });
+                
+                const voxelSize = 4.5;
+                const offsets = [
+                    [voxelSize,0,0], [-voxelSize,0,0],
+                    [0,voxelSize,0], [0,-voxelSize,0],
+                    [0,0,voxelSize], [0,0,-voxelSize]
+                ];
+                
+                voxelsGroup.children.forEach(voxel => {
+                    const x = voxel.position.x;
+                    const y = voxel.position.y;
+                    const z = voxel.position.z;
+                    
+                    let isSurface = false;
+                    for(let o of offsets) {
+                        const nx = x + o[0];
+                        const ny = y + o[1];
+                        const nz = z + o[2];
+                        const key = nx.toFixed(2) + ',' + ny.toFixed(2) + ',' + nz.toFixed(2);
+                        if(!window.activeVoxelsSet.has(key)) {
+                            isSurface = true;
+                            break;
+                        }
+                    }
+                    
+                    if (isSurface) {
+                        const mesh = new THREE.Mesh(anchorGeo, anchorMat.clone());
+                        mesh.position.copy(voxel.position);
+                        anchorsGroup.add(mesh);
+                    }
+                });
+                isAnchorsGenerated = true;
+            }
+
+            anchorsGroup.children.forEach(child => {
+                gsap.killTweensOf(child.material);
+                gsap.to(child.material, {opacity: 0.7, duration: 1});
+            });
+        };
+
+        window.hideVoxelsAndAnchors = function() {
+            if (typeof voxelsGroup !== 'undefined') {
+                voxelsGroup.children.forEach(c => {
+                    gsap.killTweensOf(c.material);
+                    gsap.to(c.material, {opacity: 0, duration: 0.5});
+                });
+            }
+            if (typeof anchorsGroup !== 'undefined') {
+                anchorsGroup.children.forEach(c => {
+                    gsap.killTweensOf(c.material);
+                    gsap.to(c.material, {opacity: 0, duration: 0.5});
+                });
+            }
+            
+            // Restore colors
+            if (typeof originalCols !== 'undefined' && originalCols[0] !== undefined && originalCols[0] !== 0) {
+                const cols = particlesGeometry.attributes.color.array;
+                for(let i=0; i<particlesCount*3; i++) cols[i] = originalCols[i];
+                particlesGeometry.attributes.color.needsUpdate = true;
+            }
+        };
+
+        window.set3DVisible = function(v) { if(typeof faceGroup !== 'undefined') faceGroup.visible = v; };
+        window.setPointDensity = function(percent) {
+            if(typeof particlesGeometry !== 'undefined' && typeof particlesCount !== 'undefined') {
+                const maxRender = 12000;
+                const count = Math.min(particlesCount, Math.floor((percent / 100) * maxRender));
+                particlesGeometry.setDrawRange(0, count);
+            }
+        };
+        window.show2DImage = function(show) {
+            gsap.to('#slide2-img', { opacity: show ? 1 : 0, duration: 0.5 });
+        };
         window.scaleUp3D = function() {
-            gsap.to(particlesMesh.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 0.8, ease: "power2.out" });
+            gsap.to(faceGroup.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 0.8, ease: "power2.out" });
         };
         window.reset3DScale = function() {
-            gsap.to(particlesMesh.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.6, ease: "power2.out" });
+            gsap.to(faceGroup.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.6, ease: "power2.out" });
         };
 
         const clock = new THREE.Clock();
@@ -385,20 +947,39 @@
         let targetRotationY = 0;
         let autoRotY = 0;
 
+        window.isAutoRotating = true;
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                window.isAutoRotating = !window.isAutoRotating;
+                
+                if (!window.isAutoRotating) {
+                    let target = Math.round(faceGroup.rotation.y / (Math.PI * 2)) * (Math.PI * 2);
+                    gsap.to(faceGroup.rotation, {
+                        y: target,
+                        duration: 1.5,
+                        ease: "power2.out",
+                        onUpdate: () => { autoRotY = faceGroup.rotation.y; }
+                    });
+                } else {
+                    gsap.killTweensOf(faceGroup.rotation);
+                }
+            }
+        });
+
         function animate() {
             requestAnimationFrame(animate);
             
             if (currentStep >= 2) {
-                autoRotY += 0.005;
+                if (window.isAutoRotating) {
+                    autoRotY += 0.01;
+                    faceGroup.rotation.y = autoRotY;
+                }
             }
             
-            targetRotationY = (mouseX * 0.8) + autoRotY;
-            targetRotationX = -mouseY * 0.8;
+            faceGroup.rotation.x = 0;
             
-            particlesMesh.rotation.y += (targetRotationY - particlesMesh.rotation.y) * 0.05;
-            particlesMesh.rotation.x += (targetRotationX - particlesMesh.rotation.x) * 0.05;
-            
-            renderer.render(scene, camera);
+            if (faceGroup.visible) renderer.render(scene, camera);
         }
         animate();
 
@@ -410,6 +991,7 @@
         
         // Initialize
         document.getElementById('page-count').textContent = maxStep + 1;
-    </script>
+    
+</script>
 </body>
 </html>

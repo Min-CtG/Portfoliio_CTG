@@ -229,7 +229,7 @@ if(canvas) {
     const isExhibition = document.body.classList.contains('exhibition-page');
     const isArtworks = document.body.classList.contains('artworks-page');
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 20000; // 선명한 구를 위해 파티클 수 복구
+    const particlesCount = 12000; // 선명한 구를 위해 파티클 수 복구
     const posArray = new Float32Array(particlesCount * 3);
     const colorsArray = new Float32Array(particlesCount * 3);
     const radius = 22;
@@ -722,7 +722,7 @@ function createMiniScene(containerId, type = "signal") {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     container.appendChild(renderer.domElement);
 
-    let particlesCount = type === 'space' ? 25000 : 25000;
+    let particlesCount = type === 'space' ? 15000 : 15000;
     let geometry;
 
     if (type === 'signal') {
