@@ -60,23 +60,32 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: absolute; z-index: 10;
         }
         
-        /* PPT PDF Wrapper - Smart Dark Mode */
+        /* PPT PDF Wrapper - Custom Transparent Theme */
         .ppt-pdf-wrapper {
             display: flex; justify-content: center; align-items: center;
             overflow: hidden;
             background: transparent !important;
-            /* Invert colors: white bg becomes black, black text becomes white */
-            filter: invert(1) hue-rotate(180deg) brightness(1.2) contrast(1.1);
-            /* Screen mode: Black becomes completely transparent, leaving white text on starry background */
-            mix-blend-mode: screen;
         }
         /* Strip the white paper background from pdf2htmlEX structures */
-        .ppt-pdf-wrapper .pf, .ppt-pdf-wrapper .pc, .ppt-pdf-wrapper .c {
+        .ppt-pdf-wrapper .pf, .ppt-pdf-wrapper .pc, .ppt-pdf-wrapper .c, .ppt-pdf-wrapper .pi {
             background-color: transparent !important;
             background: transparent !important;
             box-shadow: none !important;
             border: none !important;
             margin: 0 !important;
+        }
+        
+        /* Force ALL text to be white so it's clearly visible */
+        .ppt-pdf-wrapper .t, .ppt-pdf-wrapper [class*="fc"] {
+            color: #ffffff !important;
+            fill: #ffffff !important;
+            text-shadow: none !important;
+            -webkit-text-stroke: 0px transparent !important;
+        }
+
+        /* If pdf2htmlEX uses an image for the white background, multiply will make the white transparent! */
+        .ppt-pdf-wrapper img, .ppt-pdf-wrapper .bi, .ppt-pdf-wrapper canvas {
+            mix-blend-mode: multiply;
         }
         
         /* Nav overlay */
