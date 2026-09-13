@@ -75,7 +75,25 @@
         
         /* Nav overlay */
         .slide-controls { position: absolute; bottom: 20px; right: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.3); font-size: 0.8rem; z-index: 100; pointer-events: none;}
-        #page-indicator { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.5); font-size: 1rem; z-index: 100; pointer-events: none; transition: 0.3s;}
+        #page-indicator { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.5); font-size: 1rem; z-index: 100; cursor: pointer; transition: 0.3s;}
+        #page-indicator:hover { color: #0077ff; }
+
+        /* Page Jump Modal */
+        #page-jump-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
+        .modal-content { background: #1e1e1e; padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center; font-family: var(--font-main); color: #fff; width: 300px; }
+        body.light-mode .modal-content { background: #ffffff; color: #1a1a1a; border: 1px solid rgba(0,0,0,0.1); }
+        .modal-content h3 { margin-top: 0; margin-bottom: 1.5rem; font-weight: 500; }
+        #page-jump-input { width: 100%; padding: 10px; margin-bottom: 1.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; font-size: 1.2rem; text-align: center; outline: none; box-sizing: border-box; }
+        body.light-mode #page-jump-input { background: rgba(0, 0, 0, 0.02); border: 1px solid rgba(0, 0, 0, 0.2); color: #1a1a1a; }
+        #page-jump-input:focus { border-color: #0077ff; }
+        .modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
+        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: 0.2s; }
+        #page-jump-cancel { background: rgba(255,255,255,0.1); color: #fff; }
+        body.light-mode #page-jump-cancel { background: rgba(0,0,0,0.1); color: #1a1a1a; }
+        #page-jump-cancel:hover { background: rgba(255,255,255,0.2); }
+        body.light-mode #page-jump-cancel:hover { background: rgba(0,0,0,0.2); }
+        #page-jump-confirm { background: #0077ff; color: #fff; }
+        #page-jump-confirm:hover { background: #0055cc; }
         
         /* Missing PPT CSS */
         .content-slide h2 { 
@@ -198,6 +216,9 @@
         body.light-mode .slide-controls,
         body.light-mode #page-indicator {
             color: rgba(0,0,0,0.6);
+        }
+        body.light-mode #page-indicator:hover {
+            color: #0077ff;
         }
 
         .info-box p { font-size: 1.1rem; line-height: 1.7; color: #d0d0d0; margin-bottom: 1rem; }
@@ -349,7 +370,18 @@
     </div>
     
     <div id="page-indicator">Page <span id="page-num">1</span> / <span id="page-count">?</span></div>
-    <div class="slide-controls">LEFT CLICK / ARROW KEYS TO NAVIGATE</div>
+    <div class="slide-controls">CLICK LEFT/RIGHT HALF OR USE ARROW KEYS TO NAVIGATE</div>
+
+    <div id="page-jump-modal">
+        <div class="modal-content">
+            <h3>Jump to Page</h3>
+            <input type="number" id="page-jump-input" min="1">
+            <div class="modal-buttons">
+                <button id="page-jump-cancel">Cancel</button>
+                <button id="page-jump-confirm">Go</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
@@ -651,13 +683,56 @@
             }
         });
 
+        const pageJumpModal = document.getElementById('page-jump-modal');
+        const pageJumpInput = document.getElementById('page-jump-input');
+        
+        document.getElementById('page-indicator').addEventListener('click', (e) => {
+            e.stopPropagation();
+            pageJumpInput.value = currentStep + 1;
+            pageJumpInput.max = maxStep + 1;
+            pageJumpModal.style.display = 'flex';
+            pageJumpInput.focus();
+            // Select the text for quick overwrite
+            pageJumpInput.select();
+        });
+
+        function handlePageJump() {
+            let pageNum = parseInt(pageJumpInput.value);
+            if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxStep + 1) {
+                goToSlide(pageNum - 1);
+                pageJumpModal.style.display = 'none';
+            } else {
+                alert(`Please enter a valid page number between 1 and ${maxStep + 1}.`);
+            }
+        }
+
+        document.getElementById('page-jump-confirm').addEventListener('click', handlePageJump);
+        document.getElementById('page-jump-cancel').addEventListener('click', () => {
+            pageJumpModal.style.display = 'none';
+        });
+        
+        pageJumpInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handlePageJump();
+            if (e.key === 'Escape') pageJumpModal.style.display = 'none';
+        });
+
+        pageJumpModal.addEventListener('click', (e) => {
+            if (e.target === pageJumpModal) pageJumpModal.style.display = 'none';
+        });
+
         window.addEventListener('click', (e) => {
-            if (e.target.closest('a') || e.target.closest('.top-nav')) return;
-            if (e.button === 0) advanceSlide();
+            if (e.target.closest('a') || e.target.closest('.top-nav') || e.target.closest('.sub-nav') || e.target.closest('#page-jump-modal')) return;
+            if (e.button === 0) {
+                if (e.clientX < window.innerWidth / 2) {
+                    previousSlide();
+                } else {
+                    advanceSlide();
+                }
+            }
         });
         
         window.addEventListener('contextmenu', (e) => {
-            if (e.target.closest('a') || e.target.closest('.top-nav')) return;
+            if (e.target.closest('a') || e.target.closest('.top-nav') || e.target.closest('.sub-nav') || e.target.closest('#page-jump-modal')) return;
             e.preventDefault();
             previousSlide();
         });
