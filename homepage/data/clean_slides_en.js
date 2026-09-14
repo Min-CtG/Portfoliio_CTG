@@ -84,49 +84,49 @@ window.cleanGeneratedSlidesEn = [
         "title": "OPTIMIZATION OF 3DGS",
         "body": [
             "<strong>Optimization direction to overcome the limitations of 3D Gaussian splatting</strong>",
-"To overcome the limitations of existing 3DGS, we systematically classify four major optimization research directions (efficiency, realism, generalization, and sparse viewpoints) underway in academia."
-]
-},
-{
-"title": "Four Key Pillars of 3DGS Optimization",
-"isSpecial3D": "fourBoxes",
-"body": [
-"<div style='display: flex; gap: 20px; width: 100%; max-width: 1300px; justify-content: center; flex-wrap: nowrap;'>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>A. Efficiency</h3>",
+            "To overcome the limitations of existing 3DGS, we systematically classify four major optimization research directions (efficiency, realism, generalization, and sparse viewpoints) underway in academia."
+        ]
+    },
+    {
+        "title": "Four Key Pillars of 3DGS Optimization",
+        "isSpecial3D": "fourBoxes",
+        "body": [
+            "<div style='display: flex; gap: 20px; width: 100%; max-width: 1300px; justify-content: center; flex-wrap: nowrap;'>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>A. Efficiency</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Efficiency</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>Reduce huge memory usage, compress storage capacity dozens of times, and maximize rendering framerate</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>Reduce huge memory usage, compress storage capacity dozens of times, and maximize rendering framerate</p>",
             "</div>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>B. Realism</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>B. Realism</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Photorealism</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>Eliminates aliasing and fully restores reflective surfaces when zooming in or out.</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>Eliminates aliasing and fully restores reflective surfaces when zooming in or out.</p>",
             "</div>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>C. Generalization</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>C. Generalization</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Generalizable</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>Combined foundation model to instantly infer 3D Gaussian parameters from single/few image inputs</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>Combined foundation model to instantly infer 3D Gaussian parameters from single/few image inputs</p>",
             "</div>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>D. Sparse views</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>D. Sparse views</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Sparse Views</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>Even in very small conditions where there are only 3 or 4 photos, the diffusion model is used to fill in invisible areas.</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>Even in very small conditions where there are only 3 or 4 photos, the diffusion model is used to fill in invisible areas.</p>",
             "</div>",
             "</div>"
-]
-},
-{
-"title": "Optimization Part A: Efficiency",
-"body": [
-"-Revolutionary reduction of Gaussian memory capacity: Compressing and optimizing the huge capacity occupied by millions of Gaussian points",
-"-Reduced rendering speed and computation amount: Algorithm improvements to further increase real-time processing speed",
-"-Optimized hardware acceleration: Achieved lightweight so that it can run on mobile devices or in low-end environments."
-]
-},
-{
-"title": "Methodology Comparison",
-"body": [
-"<table><thead><tr><th>Methodology</th><th>Picture quality (PSNR)</th><th>Capacity (Size MB)</th><th>Key Features</th></tr></thead><tbody><tr><td>Vanilla 3DGS</td><td>27.49 dB</td><td>744.7 MB</td><td>Base capacity (reference point)</td></tr><tr><td>Scaffold-GS</td><td>27.50 dB</td><td>253.9 MB</td><td>Approximately 3x compression (anchor point structuring)</td></tr><tr><td>Compact3D</td><td>27.16 dB</td><td>50.3 MB</td><td>Approximately 15x compression (quantization applied)</td></tr><tr><td>LightGaussian</td><td>27.00 dB</td><td>44.5 MB</td><td>Approximately 17x compression (removes unnecessary points)</td></tr><tr><td><strong>HAC (latest SOTA)</strong></td><td><strong>27.53 dB</strong></td><td><strong>15.3 MB</strong></td><td><strong>48x compression (combined hash grid)</strong></td></tr></tbody></table>"
+        ]
+    },
+    {
+        "title": "Optimization Part A: Efficiency",
+        "body": [
+            "-Revolutionary reduction of Gaussian memory capacity: Compressing and optimizing the huge capacity occupied by millions of Gaussian points",
+            "-Reduced rendering speed and computation amount: Algorithm improvements to further increase real-time processing speed",
+            "-Optimized hardware acceleration: Achieved lightweight so that it can run on mobile devices or in low-end environments."
+        ]
+    },
+    {
+        "title": "Methodology Comparison",
+        "body": [
+            "<table><thead><tr><th>Methodology</th><th>Picture quality (PSNR)</th><th>Capacity (Size MB)</th><th>Key Features</th></tr></thead><tbody><tr><td>Vanilla 3DGS</td><td>27.49 dB</td><td>744.7 MB</td><td>Base capacity (reference point)</td></tr><tr><td>Scaffold-GS</td><td>27.50 dB</td><td>253.9 MB</td><td>Approximately 3x compression (anchor point structuring)</td></tr><tr><td>Compact3D</td><td>27.16 dB</td><td>50.3 MB</td><td>Approximately 15x compression (quantization applied)</td></tr><tr><td>LightGaussian</td><td>27.00 dB</td><td>44.5 MB</td><td>Approximately 17x compression (removes unnecessary points)</td></tr><tr><td><strong>HAC (latest SOTA)</strong></td><td><strong>27.53 dB</strong></td><td><strong>15.3 MB</strong></td><td><strong>48x compression (combined hash grid)</strong></td></tr></tbody></table>"
         ]
     },
     {
@@ -136,6 +136,10 @@ window.cleanGeneratedSlidesEn = [
             "-3D Gaussian (difficult compression): Points are randomly scattered in the air and have no order or connection rules, making it very difficult to understand surrounding relationships.",
             "-HAC's magical solution: Create a location hint by covering the 3D space with a virtual grid (hash grid), and achieve ultra-compression by AI predicting properties accurately with a 99% probability."
         ]
+    },
+    {
+        "title": "HAC (Hybrid Anchor Compression)",
+        "body": []
     },
     {
         "title": "The three core pillars that make up HAC",
@@ -158,6 +162,14 @@ window.cleanGeneratedSlidesEn = [
             "- Anchor planting: Place a small, clear anchor point at the center of each voxel to complete structuring the surrounding space."
         ],
         "isSpecial3D": "anchorPoints"
+    },
+    {
+        "title": "Anchor Feature Vector",
+        "body": [
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>Reference Position:</strong> Basecamp coordinates indicating where this anchor is embedded in 3D space.</p>",
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>Shape and Property Inference:</strong> Contains 'blueprint-like data' to calculate what size, direction (e.g., squiggly shape), and color the surrounding Gaussians should expand into.</p>"
+        ],
+        "isSpecial3D": "anchorFeature"
     },
     {
         "title": "1. 3 core mechanisms of Scaffold-GS",
@@ -207,6 +219,13 @@ window.cleanGeneratedSlidesEn = [
         ]
     },
     {
+        "title": "Instant-NGP Hash Grid Visualization",
+        "body": [
+            "- Spatial Hashing: Massive 3D coordinates are compressed into a 1D hash table, functioning as a high-performance hint map."
+        ],
+        "isSpecial3D": "instantGrid"
+    },
+    {
         "title": "2. Three core technologies of Instant-NGP",
         "body": [
             "-Multi-resolution grid: Simultaneously capture large backgrounds and fine details by overlapping multiple layers of 3D checkerboard, from a large grid to an ultra-fine grid.",
@@ -229,6 +248,13 @@ window.cleanGeneratedSlidesEn = [
             "-Completely eliminates computational bottlenecks: Instantly finds spatial hints in 0.1ms from a hash table, without having to resort to a heavy neural network with dozens of layers.",
             "-Provides key hints for HAC compression: 100% fast and complete supply of spatial context for where each anchor point is located in 3D space."
         ]
+    },
+    {
+        "title": "Entropy Compression & Hint Restoration Visualization",
+        "body": [
+            "- Bitcode Transformation: Anchor data is compressed into variable-length bitcodes based on frequency, and perfectly restored via hints."
+        ],
+        "isSpecial3D": "entropyCoding"
     },
     {
         "title": "3. Neural network-based entropy compression module",
@@ -270,6 +296,42 @@ window.cleanGeneratedSlidesEn = [
             "- Encoding the entire data: Going beyond simple character-by-character compression, encoding the entire data sequence into one huge decimal point interval between 0 and 1.",
             "-Restore without even 1% image quality distortion: Reversely uses the bit stream and hints saved during decompression to restore 100% of the original integer, preventing any source of image quality degradation."
         ]
+    },
+    {
+        "title": "3D spatial voxelization visualization",
+        "body": [
+            "- Scaffold-GS mechanism: Generates a regular voxel grid surrounding a 3D Gaussian point cloud."
+        ],
+        "isSpecial3D": "voxelGrid"
+    },
+    {
+        "title": "Anchor Point Placement Visualization",
+        "body": [
+            "- Anchor planting: Place a small, clear anchor point at the center of each voxel to complete structuring the surrounding space."
+        ],
+        "isSpecial3D": "anchorPoints"
+    },
+    {
+        "title": "Anchor Feature Vector",
+        "body": [
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>Reference Position:</strong> Basecamp coordinates indicating where this anchor is embedded in 3D space.</p>",
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>Shape and Property Inference:</strong> Contains 'blueprint-like data' to calculate what size, direction (e.g., squiggly shape), and color the surrounding Gaussians should expand into.</p>"
+        ],
+        "isSpecial3D": "anchorFeature"
+    },
+    {
+        "title": "Instant-NGP Hash Grid Visualization",
+        "body": [
+            "- Spatial Hashing: Massive 3D coordinates are compressed into a 1D hash table, functioning as a high-performance hint map."
+        ],
+        "isSpecial3D": "instantGrid"
+    },
+    {
+        "title": "Entropy Compression & Hint Restoration Visualization",
+        "body": [
+            "- Bitcode Transformation: Anchor data is compressed into variable-length bitcodes based on frequency, and perfectly restored via hints."
+        ],
+        "isSpecial3D": "entropyCoding"
     },
     {
         "title": "Achievement achieved by neural network entropy compression",

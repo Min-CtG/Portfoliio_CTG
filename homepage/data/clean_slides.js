@@ -92,25 +92,25 @@ const cleanGeneratedSlides = [
         "isSpecial3D": "fourBoxes",
         "body": [
             "<div style='display: flex; gap: 20px; width: 100%; max-width: 1300px; justify-content: center; flex-wrap: nowrap;'>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>A. 효율성</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>A. 효율성</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Efficiency</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>거대한 메모리 사용량을 줄이고 저장 용량을 수십 배 압축하며 렌더링 프레임레이트를 극대화</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>거대한 메모리 사용량을 줄이고 저장 용량을 수십 배 압축하며 렌더링 프레임레이트를 극대화</p>",
             "</div>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>B. 사실성</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>B. 사실성</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Photorealism</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>줌인 또는 줌아웃 시 화면이 자글거리는 앨리어싱을 없애고 반사 표면을 완벽히 복원</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>줌인 또는 줌아웃 시 화면이 자글거리는 앨리어싱을 없애고 반사 표면을 완벽히 복원</p>",
             "</div>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>C. 일반화</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>C. 일반화</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Generalizable</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>단일/소수 이미지 입력으로부터 3D 가우시안 파라미터를 즉시 유추하는 파운데이션 모델 결합</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>단일/소수 이미지 입력으로부터 3D 가우시안 파라미터를 즉시 유추하는 파운데이션 모델 결합</p>",
             "</div>",
-            "<div style='flex: 1; background: rgba(25, 25, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);'>",
-            "<h3 style='color: #ffffff; font-size: 1.3rem; margin-bottom: 0.3rem;'>D. 희소 뷰</h3>",
+            "<div style='flex: 1; background: rgba(220, 240, 255, 0.8); border: 1px solid rgba(0, 120, 255, 0.2); border-top: 4px solid var(--primary-color); padding: 1.5rem; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);'>",
+            "<h3 style='color: #1a1a1a; font-size: 1.3rem; margin-bottom: 0.3rem;'>D. 희소 뷰</h3>",
             "<p style='color: var(--primary-color); font-family: var(--font-tech); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 1px;'>Sparse Views</p>",
-            "<p style='font-size: 1rem; color: #d0d0d0; word-break: keep-all; line-height: 1.6;'>사진이 3~4장뿐인 극소 조건에서도 확산 모델(Diffusion)을 이용해 안 보이는 영역을 채움</p>",
+            "<p style='font-size: 1rem; color: #1a1a1a; word-break: keep-all; line-height: 1.6;'>사진이 3~4장뿐인 극소 조건에서도 확산 모델(Diffusion)을 이용해 안 보이는 영역을 채움</p>",
             "</div>",
             "</div>"
         ]
@@ -138,6 +138,10 @@ const cleanGeneratedSlides = [
         ]
     },
     {
+        "title": "HAC (Hybrid Anchor Compression)",
+        "body": []
+    },
+    {
         "title": "HAC를 구성하는 3대 핵심 기둥",
         "body": [
             "-1. Scaffold-GS (구조화): 제멋대로 흩어진 수백만 점들을 대표 기준점인 \"앵커(Anchor)\"로 질서정연하게 묶어 관리.",
@@ -158,6 +162,14 @@ const cleanGeneratedSlides = [
             "- 앵커 심기: 각 복셀의 중심에 작고 선명한 앵커 포인트를 배치하여 주변 공간 구조화를 완료합니다."
         ],
         "isSpecial3D": "anchorPoints"
+    },
+    {
+        "title": "앵커 특징 벡터",
+        "body": [
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>기준 위치:</strong> 3D 공간 상에서 이 앵커가 어디에 박혀 있는지 알리는 베이스캠프 좌표.</p>",
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>모양과 속성 유추:</strong> 그 주변에 가우시안들이 어떤 크기, 어떤 방향(꾸불꾸불한 형태 등), 어떤 색상으로 펼쳐져야 하는지를 계산해 낼 수 있는 '설계도 같은 데이터'를 품고 있음.</p>"
+        ],
+        "isSpecial3D": "anchorFeature"
     },
     {
         "title": "1. Scaffold-GS의 3대 핵심 메커니즘",
@@ -207,6 +219,13 @@ const cleanGeneratedSlides = [
         ]
     },
     {
+        "title": "Instant-NGP 해시 그리드 시각화",
+        "body": [
+            "- 공간 해싱: 3D 공간의 방대한 좌표가 1차원 해시 테이블로 압축되며 고성능 힌트 지도로 변환됩니다."
+        ],
+        "isSpecial3D": "instantGrid"
+    },
+    {
         "title": "2. Instant-NGP의 3대 핵심 기술",
         "body": [
             "-다중 해상도 그리드: 굵직한 거대 격자망부터 초미세 격자망까지 여러 겹의 3D 바둑판을 겹쳐 넓은 배경과 미세 디테일을 동시 포착.",
@@ -229,6 +248,13 @@ const cleanGeneratedSlides = [
             "-연산 병목 완벽 해소: 수십 층짜리 무거운 신경망에 묻지 않고, 해시 테이블에서 0.1ms 만에 즉각 공간 힌트를 찾아냄.",
             "-HAC 압축의 핵심 힌트 제공: 각 앵커 포인트가 3D 공간 어디에 위치해 있는지에 대한 공간적 맥락(Context)을 100% 빠르고 완벽하게 공급."
         ]
+    },
+    {
+        "title": "엔트로피 압축 및 힌트 복원 시각화",
+        "body": [
+            "- 비트 코드 변환: 빈도수에 따라 앵커 데이터가 가변 길이 비트 코드로 압축되고, 힌트를 통해 원본 값으로 완벽히 복원됩니다."
+        ],
+        "isSpecial3D": "entropyCoding"
     },
     {
         "title": "3. 신경망 기반 엔트로피 압축 모듈",
@@ -270,6 +296,42 @@ const cleanGeneratedSlides = [
             "-데이터 통째 인코딩: 단순 글자 단위 압축을 뛰어넘어, 전체 데이터 시퀀스를 0과 1 사이의 거대한 소수점 구간 하나로 묶어 인코딩.",
             "-단 1%의 화질 왜곡도 없는 복원: 압축을 풀 때 저장된 비트 스트림과 힌트를 역으로 사용하여 원본 정수를 100% 동일하게 복구해 화질 저하 원천 차단."
         ]
+    },
+    {
+        "title": "3D 공간 복셀화 (Voxelization) 시각화",
+        "body": [
+            "- Scaffold-GS 메커니즘: 3D 가우시안 점군을 감싸는 규칙적인 복셀(Voxel) 격자를 생성합니다."
+        ],
+        "isSpecial3D": "voxelGrid"
+    },
+    {
+        "title": "앵커 포인트(Anchor Point) 배치 시각화",
+        "body": [
+            "- 앵커 심기: 각 복셀의 중심에 작고 선명한 앵커 포인트를 배치하여 주변 공간 구조화를 완료합니다."
+        ],
+        "isSpecial3D": "anchorPoints"
+    },
+    {
+        "title": "앵커 특징 벡터",
+        "body": [
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>기준 위치:</strong> 3D 공간 상에서 이 앵커가 어디에 박혀 있는지 알리는 베이스캠프 좌표.</p>",
+            "<p style='font-size: 1.05rem; line-height: 1.6;'><strong>모양과 속성 유추:</strong> 그 주변에 가우시안들이 어떤 크기, 어떤 방향(꾸불꾸불한 형태 등), 어떤 색상으로 펼쳐져야 하는지를 계산해 낼 수 있는 '설계도 같은 데이터'를 품고 있음.</p>"
+        ],
+        "isSpecial3D": "anchorFeature"
+    },
+    {
+        "title": "Instant-NGP 해시 그리드 시각화",
+        "body": [
+            "- 공간 해싱: 3D 공간의 방대한 좌표가 1차원 해시 테이블로 압축되며 고성능 힌트 지도로 변환됩니다."
+        ],
+        "isSpecial3D": "instantGrid"
+    },
+    {
+        "title": "엔트로피 압축 및 힌트 복원 시각화",
+        "body": [
+            "- 비트 코드 변환: 빈도수에 따라 앵커 데이터가 가변 길이 비트 코드로 압축되고, 힌트를 통해 원본 값으로 완벽히 복원됩니다."
+        ],
+        "isSpecial3D": "entropyCoding"
     },
     {
         "title": "신경망 엔트로피 압축이 이뤄낸 성과",

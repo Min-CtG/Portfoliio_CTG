@@ -1,1071 +1,3201 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>3D Gaussian Splatting | PPT</title>
+
     <link rel="stylesheet" href="css/styles.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400..800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
     <style>
+
         body, html {
+
             margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+
             background: var(--bg-color); color: var(--text-color);
+
             font-family: var(--font-body);
+
         }
+
         
+
         /* Top Navigation Bar */
+
         .top-nav {
+
             position: absolute; top: 0; left: 0; width: 100%; height: 8%; min-height: 60px;
+
             display: flex; align-items: center; justify-content: space-between;
+
             padding: 0 3rem; box-sizing: border-box;
+
             background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+
             border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
+
+            transition: height 0.3s ease, min-height 0.3s ease;
+
         }
+
         .top-nav-left { display: flex; align-items: center; gap: 2rem; }
+
         .back-btn { font-size: 2rem; color: white; cursor: pointer; text-decoration: none; margin-bottom: 5px; }
+
         .top-nav-links { display: flex; gap: 3rem; list-style: none; margin: 0; padding: 0; }
+
         .top-nav-links a {
+
             color: rgba(255,255,255,0.4); text-decoration: none; font-family: var(--font-tech); 
+
             font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s;
+
         }
+
         .top-nav-links a.active, .top-nav-links a:hover { color: var(--primary-color); }
+
         
+
         /* Layout */
+
         #paper-layout {
+
             display: flex; width: 100vw; height: 92%; margin-top: 8vh; position: relative; z-index: 2;
+
             transition: margin-top 0.3s ease, height 0.3s ease;
+
         }
+
         #paper-layout.with-subnav {
+
             margin-top: 13vh; height: 87%;
+
         }
+
         .slide-container {
+
             width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center;
+
         }
+
         
+
         /* Slides */
+
         .slide {
+
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+
             padding: 4rem; box-sizing: border-box; text-align: center;
+
             overflow-y: auto;
+
         }
+
         .slide.active { opacity: 1; pointer-events: auto; }
+
         
+
         /* Custom Slide Styles */
+
         .title-slide h1 { font-family: var(--font-heading); font-size: clamp(3rem, 5vw, 6rem); letter-spacing: 2px; margin-bottom: 1rem; }
+
         .title-slide p { font-family: var(--font-tech); color: var(--primary-color); letter-spacing: 4px; font-size: 1.2rem; line-height: 1.5; }
+
         
+
         #slide2-img {
+
             width: 450px; height: 550px; object-fit: cover; border-radius: 8px;
+
             box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: absolute; z-index: 10;
+
         }
+
         
+
         /* PPT PDF Wrapper - Clean Mode (Original PPT colors) */
+
         .ppt-pdf-wrapper {
+
             display: flex; justify-content: center; align-items: center;
+
             overflow: hidden;
+
             background: transparent;
+
             border-radius: 12px;
+
             box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+
         }
+
         
+
         /* Nav overlay */
+
         .slide-controls { position: absolute; bottom: 20px; right: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.3); font-size: 0.8rem; z-index: 100; pointer-events: none;}
+
         #page-indicator { position: absolute; bottom: 20px; left: 20px; font-family: var(--font-tech); color: rgba(255,255,255,0.5); font-size: 1rem; z-index: 100; cursor: pointer; transition: 0.3s;}
+
         #page-indicator:hover { color: #0077ff; }
 
+
+
         /* Page Jump Modal */
+
         #page-jump-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
+
         .modal-content { background: #1e1e1e; padding: 2rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center; font-family: var(--font-main); color: #fff; width: 300px; }
+
         body.light-mode .modal-content { background: #ffffff; color: #1a1a1a; border: 1px solid rgba(0,0,0,0.1); }
+
         .modal-content h3 { margin-top: 0; margin-bottom: 1.5rem; font-weight: 500; }
+
         #page-jump-input { width: 100%; padding: 10px; margin-bottom: 1.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; color: #fff; font-size: 1.2rem; text-align: center; outline: none; box-sizing: border-box; }
+
         body.light-mode #page-jump-input { background: rgba(0, 0, 0, 0.02); border: 1px solid rgba(0, 0, 0, 0.2); color: #1a1a1a; }
+
         #page-jump-input:focus { border-color: #0077ff; }
+
         .modal-buttons { display: flex; justify-content: space-between; gap: 10px; }
+
         .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: 0.2s; }
+
         #page-jump-cancel { background: rgba(255,255,255,0.1); color: #fff; }
+
         body.light-mode #page-jump-cancel { background: rgba(0,0,0,0.1); color: #1a1a1a; }
+
         #page-jump-cancel:hover { background: rgba(255,255,255,0.2); }
+
         body.light-mode #page-jump-cancel:hover { background: rgba(0,0,0,0.2); }
+
         #page-jump-confirm { background: #0077ff; color: #fff; }
+
         #page-jump-confirm:hover { background: #0055cc; }
+
         
+
         /* Missing PPT CSS */
+
         .content-slide h2 { 
+
             font-family: var(--font-heading);
+
             font-size: 2.2rem; 
+
             margin-bottom: 1.5rem; 
+
             color: #ffffff; 
+
             letter-spacing: 1px; 
+
         }
+
         .content-slide h3 {
+
             font-family: var(--font-tech);
+
             font-size: 1.4rem;
+
             color: var(--primary-color);
+
             margin-bottom: 1rem;
+
         }
+
         .info-box {
+
             background: rgba(25, 25, 30, 0.7);
+
             border: 1px solid rgba(255, 255, 255, 0.1);
+
             padding: 2.5rem 3rem;
+
             border-radius: 12px;
+
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
             backdrop-filter: blur(5px);
+
             width: 90%; max-width: 800px;
+
             margin: 0 auto;
+
         }
+
+
 
         /* LIGHT MODE STYLES */
+
         body.light-mode {
+
             background: #f4f6f9; /* Softer off-white to help 3D points pop */
+
             color: #1a1a1a;
+
         }
+
         body.light-mode .top-nav {
+
             background: rgba(255, 255, 255, 0.8);
+
             border-bottom: 1px solid rgba(0,0,0,0.1);
+
         }
-        body.light-mode .top-nav-links a {
-            color: rgba(0,0,0,0.5);
-        }
+
+        body.light-mode .top-nav-links a { color: rgba(0,0,0,0.5); }
+
         body.light-mode .top-nav-links a.active, 
-        body.light-mode .top-nav-links a:hover {
-            color: #0077ff;
-        }
+
+        body.light-mode .top-nav-links a:hover { color: #0077ff; }
+
         body.light-mode .back-btn {
+
             color: #1a1a1a;
+
         }
-        body.light-mode .sub-nav {
-            background: rgba(255, 255, 255, 0.9);
+
+        body.light-mode .sub-nav, body.light-mode .sub-nav-efficiency {
+
+            background: rgba(240, 245, 250, 0.8);
+
             border-bottom: 1px solid rgba(0,0,0,0.1);
+
         }
-        body.light-mode .sub-nav-links a {
-            color: rgba(0,0,0,0.6);
-        }
+
+        body.light-mode .sub-nav-links a { color: rgba(0,0,0,0.5); }
+
         body.light-mode .sub-nav-links a.active, 
-        body.light-mode .sub-nav-links a:hover {
-            color: #0077ff;
-        }
+
+        body.light-mode .sub-nav-links a:hover { color: #0077ff; }
+
         body.light-mode .info-box {
+
             background: rgba(220, 240, 255, 0.8); /* Light sky-blue */
+
             border: 1px solid rgba(0, 120, 255, 0.2);
+
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
         }
+
         body.light-mode .content-slide h2 {
+
             color: #1a1a1a;
+
         }
+
         body.light-mode .info-box h3 {
+
             color: #0055cc;
+
         }
+
         body.light-mode .info-box p {
+
             color: #333333;
+
         }
+
         body.light-mode .info-box p strong {
+
             color: #0077ff;
+
             font-weight: bold;
+
         }
+
         body.light-mode .info-box th, 
+
         body.light-mode .info-box td {
+
             color: #333333;
+
             border-color: rgba(0,0,0,0.1);
+
         }
+
         body.light-mode .info-box th {
+
             background: rgba(0, 120, 255, 0.1);
+
             color: #0077ff;
+
         }
+
         body.light-mode .info-box tr:nth-child(even) {
+
             background: rgba(0,0,0,0.02);
+
         }
+
         body.light-mode .info-box td strong {
+
             color: #000;
+
         }
+
         body.light-mode .title-slide h1 {
+
             color: #1a1a1a;
+
         }
+
         body.light-mode .title-slide p {
+
             color: #0077ff;
+
         }
+
         body.light-mode .lang-btn {
+
             color: rgba(0,0,0,0.6);
+
             border-color: rgba(0,0,0,0.2);
+
         }
+
         body.light-mode .lang-btn:hover,
+
         body.light-mode .lang-btn.active {
+
             color: #0077ff;
+
             border-color: #0077ff;
+
         }
+
         body.light-mode #slide-16 h2, 
+
         body.light-mode #slide-18 h2, 
+
         body.light-mode #slide-40 h2, 
+
         body.light-mode #slide-46 h2, 
-        body.light-mode #slide-51 h2 {
+
+        body.light-mode #slide-51 h2,
+
+        body.light-mode .slide[data-special="fourBoxes"] h2 {
+
             color: #0077ff !important;
+
         }
+
         body.light-mode .theme-btn {
+
             color: rgba(0,0,0,0.6);
+
             border-color: rgba(0,0,0,0.2);
+
         }
+
         body.light-mode .theme-btn:hover {
+
             color: #0077ff;
+
             border-color: #0077ff;
+
         }
+
         body.light-mode .slide-controls,
+
         body.light-mode #page-indicator {
+
             color: rgba(0,0,0,0.6);
+
         }
+
         body.light-mode #page-indicator:hover {
+
             color: #0077ff;
+
         }
+
+
 
         .info-box p { font-size: 1.1rem; line-height: 1.7; color: #d0d0d0; margin-bottom: 1rem; }
+
         .info-box p strong { color: var(--primary-color); font-weight: normal; }
 
+
+
         /* Slide 12 (Mid-presentation Title) */
+
         #slide-12 h2 {
+
             font-size: clamp(2.5rem, 4vw, 4.5rem);
+
             margin-bottom: 0.5rem;
+
         }
+
         #slide-12 h3 {
+
             font-size: 1.2rem;
+
             letter-spacing: 2px;
+
             color: var(--primary-color);
+
         }
+
+
 
         .slide[data-special="show5Percent"] h2,
+
         .slide[data-special="show5Percent"] .info-box,
+
         .slide[data-special="show30Percent"] h2,
+
         .slide[data-special="show30Percent"] .info-box,
+
         .slide[data-special="show150Percent"] h2,
+
         .slide[data-special="show150Percent"] .info-box,
+
         .slide[data-special="show2DImage"] h2,
+
         .slide[data-special="show2DImage"] .info-box,
+
         .slide[data-special="voxelGrid"] h2,
+
         .slide[data-special="voxelGrid"] .info-box,
+
         .slide[data-special="anchorPoints"] h2,
+
         .slide[data-special="anchorPoints"] .info-box {
+
             display: none !important;
+
         }
+
+
 
         .slide[data-special="fourBoxes"] {
+
             max-width: 95vw !important;
+
             width: 95vw !important;
+
         }
+
         
+
         .slide[data-special="fourBoxes"] .info-box {
+
             background: transparent !important;
+
             border: none !important;
+
             box-shadow: none !important;
+
             padding: 0 !important;
+
             max-width: 100% !important;
+
             width: 100% !important;
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
+
         }
+
+
+
+        .slide[data-special="anchorFeature"],
+
+        .slide[data-special="instantGrid"],
+
+        .slide[data-special="entropyCoding"] {
+
+            align-items: flex-start !important;
+
+            padding-left: 55% !important;
+
+        }
+
+
+
+        .slide[data-special="anchorFeature"] > h2,
+
+        .slide[data-special="instantGrid"] > h2,
+
+        .slide[data-special="entropyCoding"] > h2 {
+
+            display: block !important;
+
+            margin: 0 0 1.5rem 0 !important;
+
+            text-align: left;
+
+            font-size: 2.2rem !important;
+
+        }
+
+
+
+        .slide[data-special="anchorFeature"] .info-box,
+
+        .slide[data-special="instantGrid"] .info-box,
+
+        .slide[data-special="entropyCoding"] .info-box {
+
+            margin: 0 !important;
+
+            width: 450px !important;
+
+            max-width: 450px !important;
+
+        }
+
+
 
         /* Table styles for Methodology Comparison */
+
         .info-box table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+
         .info-box th, .info-box td { border: 1px solid rgba(255,255,255,0.15); padding: 12px 15px; text-align: left; font-size: 1rem; color: #d0d0d0; }
+
         .info-box th { background: rgba(0, 255, 204, 0.1); color: var(--primary-color); font-weight: bold; font-family: var(--font-tech); letter-spacing: 1px; }
+
         .info-box tr:nth-child(even) { background: rgba(255,255,255,0.03); }
+
         .info-box td strong { color: #fff; font-weight: bold; }
 
+
+
         /* Sub Navigation Bar */
+
         .sub-nav {
+
             position: absolute; top: 8%; left: 0; width: 100%; height: 5%; min-height: 40px;
+
             display: flex; align-items: center; justify-content: center;
+
             box-sizing: border-box;
+
             background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
+
             border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 99;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+
+            opacity: 0; pointer-events: none; transition: top 0.3s ease, height 0.3s ease, opacity 0.3s ease, min-height 0.3s ease;
+
         }
+
         .sub-nav.active {
+
             opacity: 1; pointer-events: auto;
+
         }
-        .sub-nav-links { display: flex; gap: 3rem; list-style: none; margin: 0; padding: 0; }
-        .sub-nav-links a {
-            color: rgba(255,255,255,0.5); text-decoration: none; font-family: var(--font-tech); 
-            font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s;
+
+
+
+        .sub-nav-efficiency {
+
+            position: absolute; top: 8%; left: 0; width: 100%; height: 5%; min-height: 40px;
+
+            display: none; align-items: center; justify-content: center;
+
+            box-sizing: border-box;
+
+            background: rgba(10, 10, 15, 0.7); backdrop-filter: blur(10px);
+
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 99;
+
         }
-        .sub-nav-links a:hover { color: var(--primary-color); }
-        .sub-nav-links a.active { color: #ffffff; font-weight: bold; }
-        /* Section Titles */
-        #slide-16 h2, #slide-18 h2, #slide-40 h2, #slide-46 h2, #slide-51 h2 {
-            font-size: 3.5rem !important;
-            margin-bottom: 2.5rem !important;
-            color: var(--primary-color) !important;
-            letter-spacing: 2px !important;
-        }
+
         
+
+        body.efficiency-mode .top-nav {
+
+            top: -10% !important; /* Move it offscreen */
+
+            opacity: 0;
+
+            pointer-events: none;
+
+        }
+
+        body.efficiency-mode .sub-nav.active {
+
+            display: flex !important;
+
+            top: 0 !important;
+
+            height: 8% !important; min-height: 60px;
+
+            background: rgba(0,0,0,0.5); /* Match original top-nav */
+
+        }
+
+        body.light-mode.efficiency-mode .sub-nav.active {
+
+            background: rgba(255,255,255,0.8);
+
+        }
+
+
+
+        .sub-back-btn {
+
+            display: none; position: absolute; left: 3rem; font-size: 2rem;
+
+            color: white; cursor: pointer; text-decoration: none; margin-bottom: 5px;
+
+        }
+
+        body.efficiency-mode .sub-back-btn {
+
+            display: block;
+
+        }
+
+        body.light-mode .sub-back-btn {
+
+            color: #1a1a1a;
+
+        }
+
+        body.efficiency-mode .sub-nav-efficiency {
+
+            display: flex !important;
+
+        }
+
+        body.efficiency-mode #paper-layout {
+
+            margin-top: 13vh !important; height: 87% !important;
+
+        }
+
+
+
+        .sub-nav-links { display: flex; gap: 3rem; list-style: none; margin: 0; padding: 0; }
+
+        .sub-nav-links a {
+
+            color: rgba(255,255,255,0.5); text-decoration: none; font-family: var(--font-tech); 
+
+            font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s;
+
+        }
+
+        .sub-nav-links a:hover { color: var(--primary-color); }
+
+        .sub-nav-links a.active { color: #ffffff; font-weight: bold; }
+
+        /* Section Titles */
+
+        #slide-16 h2, #slide-18 h2, #slide-21 h2, #slide-41 h2, #slide-47 h2, #slide-52 h2, .slide[data-special="fourBoxes"] h2 {
+
+            font-size: 3.5rem !important;
+
+            margin-bottom: 2.5rem !important;
+
+            color: var(--primary-color) !important;
+
+            letter-spacing: 2px !important;
+
+        }
+
+        
+
         /* Language Buttons */
+
         .top-nav-right {
+
+            position: absolute;
+
+            top: 0; right: 0;
+
+            height: 8%; min-height: 60px;
+
             display: flex; gap: 1rem;
+
+            align-items: center;
+
+            padding-right: 3rem;
+
+            z-index: 200;
+
         }
+
         .lang-btn {
+
             background: transparent;
+
             border: 1px solid rgba(255,255,255,0.3);
+
             color: rgba(255,255,255,0.7);
+
             font-family: var(--font-tech);
+
             padding: 5px 10px;
+
             font-size: 0.8rem;
+
             border-radius: 4px;
+
             cursor: pointer;
+
             transition: 0.3s;
+
         }
+
         .lang-btn:hover, .lang-btn.active {
+
             border-color: var(--primary-color);
+
             color: var(--primary-color);
+
         }
+
     </style>
+
 </head>
+
 <body class="paper-page">
+
     
+
     <nav class="top-nav">
+
         <div class="top-nav-left">
+
             <a href="paper.html" class="back-btn">&larr;</a>
+
             <ul class="top-nav-links" style="margin-left: 2rem;">
+
                 <li><a href="#" class="active" id="nav-intro" onclick="goToSlide(0); return false;">3DGAUSSIAN</a></li>
+
                 <li><a href="#" id="nav-survey" onclick="goToSlide(12); return false;">SURVEY</a></li>
+
                 <li><a href="#" id="nav-opt" onclick="goToSlide(16); return false;">OPTIMIZATION OF 3DGS</a></li>
+
+                <li><a href="#" id="nav-end" onclick="goToSlide(70); return false;">END</a></li>
+
             </ul>
+
         </div>
-        <div class="top-nav-right">
-            <button class="lang-btn theme-btn" onclick="toggleTheme()" id="theme-toggle">🌙</button>
-            <button class="lang-btn active" onclick="setLanguage('KR')">KR</button>
-            <button class="lang-btn" onclick="setLanguage('EN')">EN</button>
-        </div>
+
     </nav>
 
-    <nav class="sub-nav">
+    <div class="top-nav-right">
+        <button class="lang-btn theme-btn" onclick="toggleTheme()" id="theme-toggle">🌙</button>
+        <button class="lang-btn active" onclick="setLanguage('KR')">KR</button>
+        <button class="lang-btn" onclick="setLanguage('EN')">EN</button>
+    </div>
+
+
+
+    <nav class="sub-nav" id="sub-nav-main">
+        <a href="#" class="sub-back-btn" onclick="goToSlide(16); return false;" title="Back to Optimization">&larr;</a>
         <ul class="sub-nav-links">
+            <li><a href="#" id="sub-intro" onclick="goToSlide(16); return false;">INTRO</a></li>
             <li><a href="#" id="sub-eff" onclick="goToSlide(18); return false;">효율성 (Efficiency)</a></li>
-            <li><a href="#" id="sub-photo" onclick="goToSlide(40); return false;">사실성 (Photorealism)</a></li>
-            <li><a href="#" id="sub-gen" onclick="goToSlide(46); return false;">일반화 (Generalizable)</a></li>
-            <li><a href="#" id="sub-sparse" onclick="goToSlide(51); return false;">희소 뷰 (Sparse Views)</a></li>
+            <li><a href="#" id="sub-photo" onclick="goToSlide(49); return false;">사실성 (Photorealism)</a></li>
+            <li><a href="#" id="sub-gen" onclick="goToSlide(55); return false;">일반화 (Generalizable)</a></li>
+            <li><a href="#" id="sub-sparse" onclick="goToSlide(60); return false;">희소 뷰 (Sparse Views)</a></li>
         </ul>
     </nav>
 
+
+
+    
+
+
+
+    
+
+    
+
+
+
+    <nav class="sub-nav-efficiency" id="sub-nav-efficiency" style="display: none;">
+
+        <ul class="sub-nav-links">
+
+            <li><a href="#" id="eff-intro" onclick="goToSlide(18); return false;">INTRO</a></li>
+
+            <li><a href="#" id="eff-hac" onclick="goToSlide(21); return false;">HAC</a></li>
+
+            <li><a href="#" id="eff-scaffold" onclick="goToSlide(26); return false;">SCAFFOLD-GS</a></li>
+
+            <li><a href="#" id="eff-instant" onclick="goToSlide(33); return false;">INSTANT-NGP</a></li>
+
+            <li><a href="#" id="eff-entropy" onclick="goToSlide(37); return false;">ENTROPYCOMPRESSION</a></li>
+
+            <li><a href="#" id="eff-outro" onclick="goToSlide(42); return false;">OUTRO</a></li>
+
+            <li><a href="#" id="eff-end" onclick="goToSlide(47); return false;">END</a></li>
+
+        </ul>
+
+    </nav>
+
+
+
     <!-- 3D Canvas Background -->
+
     <canvas id="bg-canvas" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; opacity: 0; pointer-events: none;"></canvas>
 
+
+
     <div id="paper-layout">
+
         <div class="slide-container" id="slide-container">
+
             <!-- Slide 0: Title -->
+
             <div class="slide title-slide active" id="slide-0">
+
                 <h1>3D GAUSSIAN SPLATTING</h1>
+
                 <p>SURVEY, TECHNOLOGIES, CHALLENGES,<br>AND OPPORTUNITIES</p>
+
             </div>
+
             
+
             <!-- Slide 1, 2, 3: Image to 3D -->
+
             <div class="slide" id="slide-1">
+
                 <img id="slide2-img" src="assets/ai_woman_face.jpg" alt="Human Face">
+
             </div>
+
             
+
             <!-- Generated PDF contents will be appended here -->
+
         </div>
+
     </div>
+
     
+
     <div id="page-indicator">Page <span id="page-num">1</span> / <span id="page-count">?</span></div>
+
     <div class="slide-controls">CLICK LEFT/RIGHT HALF OR USE ARROW KEYS TO NAVIGATE</div>
 
+
+
     <div id="page-jump-modal">
+
         <div class="modal-content">
+
             <h3>Jump to Page</h3>
+
             <input type="number" id="page-jump-input" min="1">
+
             <div class="modal-buttons">
+
                 <button id="page-jump-cancel">Cancel</button>
+
                 <button id="page-jump-confirm">Go</button>
+
             </div>
+
         </div>
+
     </div>
 
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
     <script src="data/faceData.js"></script>
+
     <script src="data/clean_slides.js?v=2"></script>
+
     <script src="data/clean_slides_en.js?v=4"></script>
+
     <script>
+
         // Theme logic
+
         function toggleTheme() {
+
             document.body.classList.toggle('light-mode');
+
             const isLight = document.body.classList.contains('light-mode');
+
             
+
             const toggleBtn = document.getElementById('theme-toggle');
+
             if (isLight) {
-                toggleBtn.textContent = '☀️';
-            } else {
+
                 toggleBtn.textContent = '🌙';
+
+            } else {
+
+                toggleBtn.textContent = '?';
+
             }
+
             
+
             // Improve 3D points visibility in light mode
+
             if (typeof material !== 'undefined') {
+
                 material.color.setHex(isLight ? 0x4a4a4a : 0xffffff); // Darken colors more appropriately
+
                 material.size = isLight ? 0.75 : 0.55; // Make points slightly larger in light mode to look more solid
+
                 material.needsUpdate = true;
+
             }
+
         }
+
+
 
         // Language state
+
         let currentLang = 'KR';
+
         let currentSlidesData = cleanGeneratedSlides; // Default to KR
 
+
+
         function setLanguage(lang) {
+
             if (lang === currentLang) return;
+
             currentLang = lang;
+
             
+
             // Update buttons
+
             document.querySelectorAll('.lang-btn').forEach(btn => {
+
                 if (btn.textContent === lang) btn.classList.add('active');
+
                 else btn.classList.remove('active');
+
             });
+
             
+
             // Update hardcoded nav texts
+
             if (lang === 'EN') {
+
                 document.getElementById('sub-eff').textContent = 'Efficiency';
+
                 document.getElementById('sub-photo').textContent = 'Photorealism';
+
                 document.getElementById('sub-gen').textContent = 'Generalizable';
+
                 document.getElementById('sub-sparse').textContent = 'Sparse Views';
+
             } else {
+
                 document.getElementById('sub-eff').textContent = '효율성 (Efficiency)';
+
                 document.getElementById('sub-photo').textContent = '사실성 (Photorealism)';
+
                 document.getElementById('sub-gen').textContent = '일반화 (Generalizable)';
+
                 document.getElementById('sub-sparse').textContent = '희소 뷰 (Sparse Views)';
+
             }
+
             
+
             // Update data source
+
             currentSlidesData = lang === 'EN' ? window.cleanGeneratedSlidesEn : cleanGeneratedSlides;
+
             
+
             // Re-render slides
+
             initGeneratedSlides();
+
             updateSlide(); // refresh current slide
+
         }
 
+
+
         // ==========================================
+
         // Inject Generated Presentation Slides
+
         // ==========================================
+
         let maxStep = 3; 
 
+
+
         function initGeneratedSlides() {
+
             const container = document.getElementById('slide-container');
+
             
+
             // Remove previously generated slides
+
             document.querySelectorAll('.generated-slide').forEach(el => el.remove());
 
+
+
             // Append starting from slide-4
+
             let startIdx = 0; 
+
             for (let i = startIdx; i < currentSlidesData.length; i++) {
+
                 const slideData = currentSlidesData[i];
+
                 const currentSlideNum = i - startIdx + 4;
+
                 
+
                 const slideDiv = document.createElement('div');
+
                 slideDiv.className = 'slide content-slide generated-slide';
+
                 slideDiv.id = `slide-${currentSlideNum}`;
+
                 
+
                 if (slideData.isSpecial3D) {
+
                     slideDiv.setAttribute('data-special', slideData.isSpecial3D);
+
                 }
+
                 
+
                 const h2 = document.createElement('h2');
+
                 h2.textContent = slideData.title;
+
                 slideDiv.appendChild(h2);
 
+
+
                 if (slideData.subtitle) {
+
                     const h3 = document.createElement('h3');
+
                     h3.textContent = slideData.subtitle;
+
                     slideDiv.appendChild(h3);
+
                 }
+
                 
+
                 if (slideData.body && slideData.body.length > 0) {
+
                     const infoBox = document.createElement('div');
+
                     infoBox.className = 'info-box';
+
                     
+
                     const isHtml = slideData.body.some(line => line.trim().startsWith('<'));
+
                     if (isHtml) {
+
                         const wrapper = document.createElement('div');
+
                         wrapper.innerHTML = slideData.body.join(' ');
+
                         while (wrapper.firstChild) {
+
                             infoBox.appendChild(wrapper.firstChild);
+
                         }
+
                     } else {
+
                         slideData.body.forEach(lineText => {
+
                             const p = document.createElement('p');
+
                             if (lineText.startsWith('-')) {
+
                                 const parts = lineText.substring(1).split(':');
+
                                 if (parts.length > 1) {
+
                                     p.innerHTML = `<strong>- ${parts[0].trim()}:</strong> ${parts.slice(1).join(':').trim()}`;
+
                                 } else {
+
                                     p.textContent = `- ${lineText.substring(1).trim()}`;
+
                                 }
+
                             } else {
+
                                 p.textContent = lineText;
+
                             }
+
                             infoBox.appendChild(p);
+
                         });
+
                     }
+
                     slideDiv.appendChild(infoBox);
+
                 }
+
                 container.appendChild(slideDiv);
+
             }
+
             maxStep = 3 + (currentSlidesData.length - startIdx);
+
             document.getElementById('page-count').textContent = maxStep + 1;
+
         }
+
+
 
         // Initialize slides on first load
+
         initGeneratedSlides();
 
+
+
         // ==========================================
+
         // PPT Slide Logic
+
         // ==========================================
+
         let currentStep = 0;
+
         
+
         function goToSlide(n) {
+
             currentStep = n;
+
             updateSlide();
+
         }
+
         
+
         function updateSlide() {
+
             document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+
             document.getElementById('page-num').textContent = currentStep + 1;
+
             
+
             // Nav Highlighting
+
             document.querySelectorAll('.top-nav-links a, .sub-nav-links a').forEach(a => a.classList.remove('active'));
+
             if(currentStep < 12) {
+
                 document.getElementById('nav-intro').classList.add('active');
+
             } else if (currentStep >= 12 && currentStep < 16) {
+
                 document.getElementById('nav-survey').classList.add('active');
-            } else {
+
+            } else if (currentStep >= 16 && currentStep < 70) {
+
                 document.getElementById('nav-opt').classList.add('active');
+
+            } else {
+
+                document.getElementById('nav-end').classList.add('active');
+
             }
+
+
 
             // Sub-nav Visibility Logic
-            const subNav = document.querySelector('.sub-nav');
+
+            // Sub-nav Visibility Logic
+
+            const subNavMain = document.getElementById('sub-nav-main');
+
+            const subNavEff = document.getElementById('sub-nav-efficiency');
+
             const paperLayout = document.getElementById('paper-layout');
-            if (currentStep >= 16) {
-                subNav.classList.add('active');
+
+            const body = document.body;
+
+
+
+            if (currentStep >= 18 && currentStep < 49) {
+
+                // Efficiency mode active
+
+                body.classList.add('efficiency-mode');
+
+                subNavMain.classList.add('active');
+
                 paperLayout.classList.add('with-subnav');
+
                 
-                // Sub-nav Highlights
-                if (currentStep >= 51) {
+
+                // Highlight logic for sub-nav-main
+
+                document.getElementById('sub-eff').classList.add('active');
+
+
+
+                // Highlight logic for sub-nav-efficiency
+
+                if (currentStep >= 47) document.getElementById('eff-end').classList.add('active');
+
+                else if (currentStep >= 42) document.getElementById('eff-outro').classList.add('active');
+
+                else if (currentStep >= 37) document.getElementById('eff-entropy').classList.add('active');
+
+                else if (currentStep >= 33) document.getElementById('eff-instant').classList.add('active');
+
+                else if (currentStep >= 26) document.getElementById('eff-scaffold').classList.add('active');
+
+                else if (currentStep >= 21) document.getElementById('eff-hac').classList.add('active');
+
+                else document.getElementById('eff-intro').classList.add('active');
+
+            } else if (currentStep >= 16) {
+
+                body.classList.remove('efficiency-mode');
+
+                subNavMain.classList.add('active');
+
+                paperLayout.classList.add('with-subnav');
+
+                
+
+                // Sub-nav Highlights for main
+
+                if (currentStep >= 60) {
+
                     document.getElementById('sub-sparse').classList.add('active');
-                } else if (currentStep >= 46) {
+
+                } else if (currentStep >= 55) {
+
                     document.getElementById('sub-gen').classList.add('active');
-                } else if (currentStep >= 40) {
+
+                } else if (currentStep >= 49) {
+
                     document.getElementById('sub-photo').classList.add('active');
+
                 } else if (currentStep >= 18) {
+
                     document.getElementById('sub-eff').classList.add('active');
+
+                } else {
+
+                    document.getElementById('sub-intro').classList.add('active');
+
                 }
+
             } else {
-                subNav.classList.remove('active');
+
+                body.classList.remove('efficiency-mode');
+
+                subNavMain.classList.remove('active');
+
                 paperLayout.classList.remove('with-subnav');
+
             }
 
+
+
             if (currentStep === 0) {
+
                 document.getElementById('slide-0').classList.add('active');
+
                 gsap.to('#slide2-img', { opacity: 0, duration: 0.5 });
+
                 gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } });
+
                 document.getElementById('bg-canvas').style.pointerEvents = 'none';
+
             } 
+
             else if (currentStep === 1) {
+
                 document.getElementById('slide-1').classList.add('active');
+
                 gsap.to('#slide2-img', { opacity: 1, duration: 0.5 });
+
                 gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } }); 
+
                 if(window.reset3DScale) window.reset3DScale();
+
                 if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                 document.getElementById('bg-canvas').style.pointerEvents = 'none';
+
             }
+
             else if (currentStep === 2) {
+
                 document.getElementById('slide-1').classList.add('active');
+
                 gsap.to('#slide2-img', { opacity: 0, duration: 0.8 });
+
                 if(window.set3DVisible) window.set3DVisible(true);
+
                 gsap.to('#bg-canvas', { opacity: 0.8, duration: 0.8 }); 
+
                 if(window.reset3DScale) window.reset3DScale();
+
                 if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                 document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
             }
+
             else if (currentStep === 3) {
+
                 document.getElementById('slide-1').classList.add('active');
+
                 if(window.scaleUp3D) window.scaleUp3D(); 
+
                 if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                 if(window.set3DVisible) window.set3DVisible(true);
+
                 if(window.set3DVisible) window.set3DVisible(true);
+
                         gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
                 document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
             }
+
             else if (currentStep > 3) {
+
                 const targetSlide = document.getElementById(`slide-${currentStep}`);
+
                 if(targetSlide) {
+
                     targetSlide.classList.add('active');
+
                     const special = targetSlide.getAttribute('data-special');
+
                     
+
                     if (special === 'voxelGrid') {
+
                         if(window.scaleUp3D) window.scaleUp3D();
+
                         if(window.showVoxels) window.showVoxels();
+
                         if(window.set3DVisible) window.set3DVisible(true);
+
                 if(window.set3DVisible) window.set3DVisible(true);
+
                         gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
                     } else if (special === 'anchorPoints') {
+
                         if(window.scaleUp3D) window.scaleUp3D();
+
                         if(window.showAnchors) window.showAnchors();
+
                         if(window.set3DVisible) window.set3DVisible(true);
+
                         gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
+                    } else if (special === 'anchorFeature') {
+
+                        if(window.showAnchorFeature) window.showAnchorFeature();
+
+                        if(window.set3DVisible) window.set3DVisible(true);
+
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
+                    } else if (special === 'instantGrid') {
+
+                        if(window.showInstantGrid) window.showInstantGrid();
+
+                        if(window.set3DVisible) window.set3DVisible(true);
+
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
+                    } else if (special === 'entropyCoding') {
+
+                        if(window.showEntropyCoding) window.showEntropyCoding();
+
+                        if(window.set3DVisible) window.set3DVisible(true);
+
+                        gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
+                        document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
                     } else if (special === 'show5Percent') {
+
                         window.isAutoRotating = true;
+
                         if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                         if(window.reset3DScale) window.reset3DScale();
+
                         if(window.set3DVisible) window.set3DVisible(true);
+
                         if(window.setPointDensity) window.setPointDensity(5);
+
                         if(window.show2DImage) window.show2DImage(false);
+
                         gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
                     } else if (special === 'show30Percent') {
+
                         window.isAutoRotating = true;
+
                         if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                         if(window.reset3DScale) window.reset3DScale();
+
                         if(window.set3DVisible) window.set3DVisible(true);
+
                         if(window.setPointDensity) window.setPointDensity(30);
+
                         if(window.show2DImage) window.show2DImage(false);
+
                         gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
                     } else if (special === 'show150Percent') {
+
                         if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                         if(window.reset3DScale) window.reset3DScale();
+
                         if(window.set3DVisible) window.set3DVisible(true);
+
                         if(window.setPointDensity) window.setPointDensity(150);
+
                         if(window.show2DImage) window.show2DImage(false);
+
                         gsap.to('#bg-canvas', { opacity: 1, duration: 0.5 });
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'auto';
+
                         window.isAutoRotating = false;
+
                         if (typeof faceGroup !== 'undefined') {
+
+                            let currentY = autoRotY % (Math.PI * 2);
+
+                            if (currentY > Math.PI) currentY -= Math.PI * 2;
+
+                            if (currentY < -Math.PI) currentY += Math.PI * 2;
+
+                            faceGroup.rotation.y = currentY;
+
                             gsap.to(faceGroup.rotation, { y: 0, duration: 1.5, ease: "power2.out" });
+
                             autoRotY = 0;
+
                         }
+
                     } else if (special === 'show2DImage') {
+
                         document.getElementById('slide-1').classList.add('active');
+
                         if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                         gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } });
+
                         if(window.show2DImage) window.show2DImage(true);
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'none';
+
                     } else {
+
                         // Regular text slide
+
                         if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
                         if(window.setPointDensity) window.setPointDensity(100);
+
                         if(window.show2DImage) window.show2DImage(false);
+
                         gsap.to('#bg-canvas', { opacity: 0, duration: 0.5, onComplete: () => { if(window.set3DVisible) window.set3DVisible(false); } });
+
                         if(window.reset3DScale) window.reset3DScale();
+
                         document.getElementById('bg-canvas').style.pointerEvents = 'none';
+
                     }
+
                 }
+
             }
+
         }
+
+
+
 
 
         function advanceSlide() {
+
             if (currentStep < maxStep) { currentStep++; updateSlide(); }
+
         }
+
+
 
         function previousSlide() {
+
             if (currentStep > 0) { currentStep--; updateSlide(); }
+
         }
 
+
+
         window.addEventListener('keydown', (e) => {
+
             if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'Enter') {
+
                 advanceSlide();
+
             } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+
                 previousSlide();
+
             }
+
         });
+
+
 
         const pageJumpModal = document.getElementById('page-jump-modal');
+
         const pageJumpInput = document.getElementById('page-jump-input');
+
         
+
         document.getElementById('page-indicator').addEventListener('click', (e) => {
+
             e.stopPropagation();
+
             pageJumpInput.value = currentStep + 1;
+
             pageJumpInput.max = maxStep + 1;
+
             pageJumpModal.style.display = 'flex';
+
             pageJumpInput.focus();
+
             // Select the text for quick overwrite
+
             pageJumpInput.select();
+
         });
+
+
 
         function handlePageJump() {
+
             let pageNum = parseInt(pageJumpInput.value);
+
             if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxStep + 1) {
+
                 goToSlide(pageNum - 1);
+
                 pageJumpModal.style.display = 'none';
+
             } else {
+
                 alert(`Please enter a valid page number between 1 and ${maxStep + 1}.`);
+
             }
+
         }
+
+
 
         document.getElementById('page-jump-confirm').addEventListener('click', handlePageJump);
+
         document.getElementById('page-jump-cancel').addEventListener('click', () => {
+
             pageJumpModal.style.display = 'none';
+
         });
+
         
+
         pageJumpInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') handlePageJump();
-            if (e.key === 'Escape') pageJumpModal.style.display = 'none';
+
+            if (e.key === 'Enter') {
+
+                e.stopPropagation();
+
+                handlePageJump();
+
+            }
+
+            if (e.key === 'Escape') {
+
+                e.stopPropagation();
+
+                pageJumpModal.style.display = 'none';
+
+            }
+
         });
+
+
 
         pageJumpModal.addEventListener('click', (e) => {
+
             if (e.target === pageJumpModal) pageJumpModal.style.display = 'none';
+
         });
+
+
 
         window.addEventListener('click', (e) => {
+
             if (e.target.closest('a') || e.target.closest('.top-nav') || e.target.closest('.sub-nav') || e.target.closest('#page-jump-modal')) return;
+
             if (e.button === 0) {
+
                 if (e.clientX < window.innerWidth / 2) {
+
                     previousSlide();
+
                 } else {
+
                     advanceSlide();
+
                 }
+
             }
-        });
-        
-        window.addEventListener('contextmenu', (e) => {
-            if (e.target.closest('a') || e.target.closest('.top-nav') || e.target.closest('.sub-nav') || e.target.closest('#page-jump-modal')) return;
-            e.preventDefault();
-            previousSlide();
+
         });
 
+        
+
+        window.addEventListener('contextmenu', (e) => {
+
+            if (e.target.closest('a') || e.target.closest('.top-nav') || e.target.closest('.sub-nav') || e.target.closest('#page-jump-modal')) return;
+
+            e.preventDefault();
+
+            previousSlide();
+
+        });
+
+
+
         // ==========================================
+
         // Custom 3D Script for Paper Page
+
         // ==========================================
+
         const canvas = document.getElementById('bg-canvas');
+
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+
         renderer.setSize(window.innerWidth, window.innerHeight);
+
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+
+
         const scene = new THREE.Scene();
+
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+
         camera.position.z = 120;
 
+
+
         const particlesGeometry = new THREE.BufferGeometry();
+
         const particlesCount = 18000;
+
         const posArray = new Float32Array(particlesCount * 3);
+
         const colorsArray = new Float32Array(particlesCount * 3);
 
+
+
         for(let i = 0; i < particlesCount; i++) {
+
             posArray[i*3] = (Math.random() - 0.5) * 120;
+
             posArray[i*3+1] = (Math.random() - 0.5) * 120;
+
             posArray[i*3+2] = (Math.random() - 0.5) * 120;
+
             colorsArray[i*3] = 0.2; colorsArray[i*3+1] = 0.2; colorsArray[i*3+2] = 0.3; 
+
         }
+
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
         particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
 
+
+
         const canvasTexture = document.createElement('canvas');
+
         canvasTexture.width = 32; canvasTexture.height = 32;
+
         const context = canvasTexture.getContext('2d');
+
         const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+
         gradient.addColorStop(0, 'rgba(255,255,255,1)');
+
         gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
         context.fillStyle = gradient;
+
         context.fillRect(0,0,32,32);
+
         const splatTexture = new THREE.CanvasTexture(canvasTexture);
 
+
+
         const material = new THREE.PointsMaterial({
+
             size: 0.55, 
+
             map: splatTexture, 
+
             alphaTest: 0.01,
+
             vertexColors: true,
+
             transparent: true,
+
             opacity: 0.9,
+
             depthWrite: false
+
         });
+
+
 
         const particlesMesh = new THREE.Points(particlesGeometry, material);
+
         const faceGroup = new THREE.Group();
+
         faceGroup.add(particlesMesh);
+
         
+
         const voxelsGroup = new THREE.Group();
+
         const anchorsGroup = new THREE.Group();
+
         faceGroup.add(voxelsGroup);
+
         faceGroup.add(anchorsGroup);
+
         
+
         scene.add(faceGroup);
+
         
+
         let originalCols = new Float32Array(particlesCount * 3);
 
+
+
         setTimeout(() => {
+
             try {
+
                 const loader = new THREE.OBJLoader();
+
                 const object = loader.parse(faceObjData);
+
                 let mesh;
+
                 object.traverse((child) => { if (child.isMesh && !mesh) mesh = child; });
+
                 
+
                 if (mesh) {
+
                     let geom = mesh.geometry;
+
                     if (geom.index) geom = geom.toNonIndexed();
+
                     
+
                     const pos = geom.attributes.position.array;
+
                     
+
                     geom.computeBoundingBox();
+
                     const bb = geom.boundingBox;
+
                     const size = new THREE.Vector3();
+
                     bb.getSize(size);
+
                     const center = new THREE.Vector3();
+
                     bb.getCenter(center);
 
+
+
                     const scale = 50 / Math.max(size.x, size.y, size.z);
+
                     const triCount = pos.length / 9;
+
                     const currentPos = particlesGeometry.attributes.position.array;
+
                     const currentCol = particlesGeometry.attributes.color.array;
 
+
+
                     for(let i = 0; i < particlesCount; i++) {
+
                         const triIndex = Math.floor(Math.random() * triCount) * 9;
+
                         
+
                         let r1 = Math.random();
+
                         let r2 = Math.random();
+
                         if(r1 + r2 > 1) { r1 = 1 - r1; r2 = 1 - r2; }
+
                         const r3 = 1 - r1 - r2;
+
                         
+
                         const px = pos[triIndex] * r1 + pos[triIndex+3] * r2 + pos[triIndex+6] * r3;
+
                         const py = pos[triIndex+1] * r1 + pos[triIndex+4] * r2 + pos[triIndex+7] * r3;
+
                         const pz = pos[triIndex+2] * r1 + pos[triIndex+5] * r2 + pos[triIndex+8] * r3;
+
                         
+
                         const tx = (px - center.x) * scale;
+
                         const ty = (py - center.y) * scale - 5;
+
                         const tz = (pz - center.z) * scale;
+
                         
+
                         currentPos[i*3] = tx;
+
                         currentPos[i*3+1] = ty;
+
                         currentPos[i*3+2] = tz;
+
                         
+
                         currentCol[i*3] = 0.5 + (tx / 30);
+
                         currentCol[i*3+1] = 0.6 + (ty / 30);
+
                         currentCol[i*3+2] = 0.9 + (tz / 20);
+
                     }
+
+
 
                     particlesGeometry.attributes.position.needsUpdate = true;
+
                     particlesGeometry.attributes.color.needsUpdate = true;
+
                     // Save original colors for restoring
+
                     for(let i=0; i<particlesCount*3; i++) {
+
                         originalCols[i] = currentCol[i];
+
                     }
+
                 }
+
             } catch(e) { console.error(e); }
+
         }, 500);
 
+
+
         let mouseX = 0, mouseY = 0;
+
         
+
         window.addEventListener('mousemove', (e) => {
+
             mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+
             mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+
         });
 
+
+
         
+
         window.activeVoxelsSet = new Set();
+
         let isVoxelsGenerated = false;
+
         let isAnchorsGenerated = false;
+
         
+
         window.showVoxels = function() {
+
             // Restore colors
+
             if (originalCols[0] !== undefined && originalCols[0] !== 0) {
+
                 const cols = particlesGeometry.attributes.color.array;
+
                 for(let i=0; i<particlesCount*3; i++) cols[i] = originalCols[i];
+
                 particlesGeometry.attributes.color.needsUpdate = true;
+
             }
+
             
+
             // Hide anchors if coming backwards
-            anchorsGroup.children.forEach(child => {
-                gsap.killTweensOf(child.material);
-                gsap.to(child.material, {opacity: 0, duration: 0.5});
-            });
+
+            if (typeof anchorsGroup !== 'undefined' && anchorsGroup) {
+
+                const anchorMats = anchorsGroup.children.map(c => c.material);
+
+                gsap.killTweensOf(anchorMats);
+
+                gsap.to(anchorMats, {opacity: 0, duration: 0.5});
+
+            }
+
+
 
             if (!isVoxelsGenerated) {
+
                 const pos = particlesGeometry.attributes.position.array;
+
                 const voxelSize = 4.5;
+
                 
+
+                // Use integer hashing for massive speedup over string concatenation
+
                 for (let i = 0; i < particlesCount; i++) {
-                    const px = pos[i*3];
-                    const py = pos[i*3+1];
-                    const pz = pos[i*3+2];
+
+                    const cx = Math.floor(pos[i*3] / voxelSize);
+
+                    const cy = Math.floor(pos[i*3+1] / voxelSize);
+
+                    const cz = Math.floor(pos[i*3+2] / voxelSize);
+
                     
-                    const vx = Math.floor(px / voxelSize) * voxelSize + (voxelSize/2);
-                    const vy = Math.floor(py / voxelSize) * voxelSize + (voxelSize/2);
-                    const vz = Math.floor(pz / voxelSize) * voxelSize + (voxelSize/2);
-                    
-                    window.activeVoxelsSet.add(vx.toFixed(2) + ',' + vy.toFixed(2) + ',' + vz.toFixed(2));
+
+                    const hash = (cx + 1000) + ((cy + 1000) * 10000) + ((cz + 1000) * 100000000);
+
+                    window.activeVoxelsSet.add(hash);
+
                 }
+
                 
+
                 const boxGeo = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
+
                 const boxMat = new THREE.LineBasicMaterial({ color: 0x4488aa, transparent: true, opacity: 0 });
+
                 const edges = new THREE.EdgesGeometry(boxGeo);
+
                 
-                window.activeVoxelsSet.forEach(key => {
-                    const [x, y, z] = key.split(',').map(Number);
+
+                window.activeVoxelsSet.forEach(hash => {
+
+                    const cx = (hash % 10000) - 1000;
+
+                    const cy = (Math.floor(hash / 10000) % 10000) - 1000;
+
+                    const cz = Math.floor(hash / 100000000) - 1000;
+
+                    
+
+                    const vx = cx * voxelSize + (voxelSize/2);
+
+                    const vy = cy * voxelSize + (voxelSize/2);
+
+                    const vz = cz * voxelSize + (voxelSize/2);
+
+
+
                     const line = new THREE.LineSegments(edges, boxMat.clone());
-                    line.position.set(x, y, z);
+
+                    line.position.set(vx, vy, vz);
+
                     voxelsGroup.add(line);
+
                 });
+
                 isVoxelsGenerated = true;
+
             }
+
             
-            voxelsGroup.children.forEach(child => {
-                gsap.killTweensOf(child.material);
-                gsap.to(child.material, {opacity: 0.12, duration: 1});
-            });
+
+            const voxelMats = voxelsGroup.children.map(c => c.material);
+
+            gsap.killTweensOf(voxelMats);
+
+            voxelMats.forEach(mat => mat.color.setHex(0x4488aa));
+
+            gsap.to(voxelMats, {opacity: 0.3, duration: 1});
+
         };
+
+
 
         window.showAnchors = function() {
+
             if (!isVoxelsGenerated) {
+
                 window.showVoxels();
+
             } else {
-                voxelsGroup.children.forEach(child => {
-                    gsap.killTweensOf(child.material);
-                    gsap.to(child.material, {opacity: 0.12, duration: 1});
-                });
-            }
-            
-            // Darken points
-            const cols = particlesGeometry.attributes.color.array;
-            for(let i=0; i<particlesCount*3; i++) {
-                cols[i] = originalCols[i] * 0.15;
-            }
-            particlesGeometry.attributes.color.needsUpdate = true;
-            
-            if (!isAnchorsGenerated) {
-                const anchorGeo = new THREE.SphereGeometry(0.5, 16, 16);
-                const anchorMat = new THREE.MeshBasicMaterial({ color: 0xdd5555, transparent: true, opacity: 0 });
-                
-                const voxelSize = 4.5;
-                const offsets = [
-                    [voxelSize,0,0], [-voxelSize,0,0],
-                    [0,voxelSize,0], [0,-voxelSize,0],
-                    [0,0,voxelSize], [0,0,-voxelSize]
-                ];
-                
-                voxelsGroup.children.forEach(voxel => {
-                    const x = voxel.position.x;
-                    const y = voxel.position.y;
-                    const z = voxel.position.z;
-                    
-                    let isSurface = false;
-                    for(let o of offsets) {
-                        const nx = x + o[0];
-                        const ny = y + o[1];
-                        const nz = z + o[2];
-                        const key = nx.toFixed(2) + ',' + ny.toFixed(2) + ',' + nz.toFixed(2);
-                        if(!window.activeVoxelsSet.has(key)) {
-                            isSurface = true;
-                            break;
-                        }
-                    }
-                    
-                    if (isSurface) {
-                        const mesh = new THREE.Mesh(anchorGeo, anchorMat.clone());
-                        mesh.position.copy(voxel.position);
-                        anchorsGroup.add(mesh);
-                    }
-                });
-                isAnchorsGenerated = true;
+
+                const voxelMats = voxelsGroup.children.map(c => c.material);
+
+                gsap.killTweensOf(voxelMats);
+
+                voxelMats.forEach(mat => mat.color.setHex(0x4488aa));
+
+                gsap.to(voxelMats, {opacity: 0.3, duration: 1});
+
             }
 
-            anchorsGroup.children.forEach(child => {
-                gsap.killTweensOf(child.material);
-                gsap.to(child.material, {opacity: 0.7, duration: 1});
-            });
+            
+
+            // Darken points
+
+            const cols = particlesGeometry.attributes.color.array;
+
+            for(let i=0; i<particlesCount*3; i++) {
+
+                cols[i] = originalCols[i] * 0.15;
+
+            }
+
+            particlesGeometry.attributes.color.needsUpdate = true;
+
+            
+
+            if (!isAnchorsGenerated) {
+
+                const anchorGeo = new THREE.SphereGeometry(0.5, 16, 16);
+
+                const anchorMat = new THREE.MeshBasicMaterial({ color: 0xdd5555, transparent: true, opacity: 0 });
+
+                const voxelSize = 4.5;
+
+                
+
+                voxelsGroup.children.forEach(voxel => {
+
+                    const cx = Math.floor(voxel.position.x / voxelSize);
+
+                    const cy = Math.floor(voxel.position.y / voxelSize);
+
+                    const cz = Math.floor(voxel.position.z / voxelSize);
+
+                    
+
+                    const offsets = [
+
+                        [1,0,0], [-1,0,0],
+
+                        [0,1,0], [0,-1,0],
+
+                        [0,0,1], [0,0,-1]
+
+                    ];
+
+                    
+
+                    let isSurface = false;
+
+                    for(let o of offsets) {
+
+                        const nx = cx + o[0];
+
+                        const ny = cy + o[1];
+
+                        const nz = cz + o[2];
+
+                        const hash = (nx + 1000) + ((ny + 1000) * 10000) + ((nz + 1000) * 100000000);
+
+                        if(!window.activeVoxelsSet.has(hash)) {
+
+                            isSurface = true;
+
+                            break;
+
+                        }
+
+                    }
+
+                    
+
+                    if (isSurface) {
+
+                        const mesh = new THREE.Mesh(anchorGeo, anchorMat.clone());
+
+                        mesh.position.copy(voxel.position);
+
+                        anchorsGroup.add(mesh);
+
+                    }
+
+                });
+
+                isAnchorsGenerated = true;
+
+            }
+
+
+
+            const anchorMats = anchorsGroup.children.map(c => c.material);
+
+            const anchorScales = anchorsGroup.children.map(c => c.scale);
+
+            gsap.killTweensOf(anchorMats);
+
+            gsap.killTweensOf(anchorScales);
+
+            anchorMats.forEach(mat => mat.color.setHex(0xdd5555));
+
+            gsap.to(anchorMats, {opacity: 0.7, duration: 1});
+
+            gsap.to(anchorScales, {x: 1, y: 1, z: 1, duration: 1});
+
         };
+
+
+
+        window.showAnchorFeature = function() {
+
+            if (!isAnchorsGenerated) {
+
+                window.showAnchors();
+
+            }
+
+
+
+            window.isAutoRotating = false;
+
+            let currentY = autoRotY % (Math.PI * 2);
+
+            if (currentY > Math.PI) currentY -= Math.PI * 2;
+
+            if (currentY < -Math.PI) currentY += Math.PI * 2;
+
+            faceGroup.rotation.y = currentY;
+
+            gsap.to(faceGroup.rotation, { y: 0, duration: 1.5, ease: "power2.out" });
+
+            autoRotY = 0;
+
+            
+
+            // Find rightmost anchor
+
+            let targetAnchorIdx = 0;
+
+            let maxX = -Infinity;
+
+            anchorsGroup.children.forEach((c, i) => {
+
+                if (c.position.x > maxX) {
+
+                    maxX = c.position.x;
+
+                    targetAnchorIdx = i;
+
+                }
+
+            });
+
+
+
+            if(anchorsGroup.children[targetAnchorIdx]) {
+
+                let targetPos = anchorsGroup.children[targetAnchorIdx].position;
+
+                let s = 3.5;
+
+                
+
+                // Move faceGroup so targetPos is slightly left of center
+
+                gsap.killTweensOf(faceGroup.position);
+
+                gsap.killTweensOf(faceGroup.scale);
+
+                gsap.to(faceGroup.position, { 
+
+                    x: -targetPos.x * s - 20, 
+
+                    y: -targetPos.y * s, 
+
+                    duration: 1.5, ease: "power2.inOut" 
+
+                });
+
+                gsap.to(faceGroup.scale, { x: s, y: s, z: s, duration: 1.5, ease: "power2.inOut" });
+
+                
+
+                const highVoxelMats = [];
+
+                const lowVoxelMats = [];
+
+                voxelsGroup.children.forEach((child) => {
+
+                    if (child.position.distanceTo(targetPos) < 0.1) {
+
+                        highVoxelMats.push(child.material);
+
+                        child.material.color.setHex(0x00ffff);
+
+                    } else {
+
+                        lowVoxelMats.push(child.material);
+
+                        child.material.color.setHex(0x4488aa);
+
+                    }
+
+                });
+
+                gsap.killTweensOf([...highVoxelMats, ...lowVoxelMats]);
+
+                if (highVoxelMats.length > 0) gsap.to(highVoxelMats, {opacity: 1.0, duration: 1});
+
+                if (lowVoxelMats.length > 0) gsap.to(lowVoxelMats, {opacity: 0.02, duration: 1});
+
+
+
+                const highAnchorMats = [];
+
+                const lowAnchorMats = [];
+
+                const highAnchorScales = [];
+
+                const lowAnchorScales = [];
+
+                anchorsGroup.children.forEach((child, index) => {
+
+                    if (index === targetAnchorIdx) {
+
+                        highAnchorMats.push(child.material);
+
+                        highAnchorScales.push(child.scale);
+
+                        child.material.color.setHex(0xff0000);
+
+                    } else {
+
+                        lowAnchorMats.push(child.material);
+
+                        lowAnchorScales.push(child.scale);
+
+                        child.material.color.setHex(0xdd5555);
+
+                    }
+
+                });
+
+                gsap.killTweensOf([...highAnchorMats, ...lowAnchorMats, ...highAnchorScales, ...lowAnchorScales]);
+
+                if (highAnchorMats.length > 0) gsap.to(highAnchorMats, {opacity: 1.0, duration: 1});
+
+                if (lowAnchorMats.length > 0) gsap.to(lowAnchorMats, {opacity: 0.05, duration: 1});
+
+                if (highAnchorScales.length > 0) gsap.to(highAnchorScales, {x: 2, y: 2, z: 2, duration: 1});
+
+                if (lowAnchorScales.length > 0) gsap.to(lowAnchorScales, {x: 1, y: 1, z: 1, duration: 1});
+
+            }
+
+
+
+            // Darken points even more
+
+            const cols = particlesGeometry.attributes.color.array;
+
+            for(let i=0; i<particlesCount*3; i++) {
+
+                cols[i] = originalCols[i] * 0.03;
+
+            }
+
+            particlesGeometry.attributes.color.needsUpdate = true;
+
+        };
+
+
 
         window.hideVoxelsAndAnchors = function() {
+
             if (typeof voxelsGroup !== 'undefined') {
+
                 voxelsGroup.children.forEach(c => {
+
                     gsap.killTweensOf(c.material);
+
                     gsap.to(c.material, {opacity: 0, duration: 0.5});
+
+                    c.material.color.setHex(0x4488aa);
+
                 });
+
             }
+
             if (typeof anchorsGroup !== 'undefined') {
+
                 anchorsGroup.children.forEach(c => {
+
                     gsap.killTweensOf(c.material);
+
                     gsap.to(c.material, {opacity: 0, duration: 0.5});
+
+                    c.material.color.setHex(0xdd5555);
+
+                    gsap.to(c.scale, {x: 1, y: 1, z: 1, duration: 0.5});
+
                 });
+
             }
+
             
-            // Restore colors
-            if (typeof originalCols !== 'undefined' && originalCols[0] !== undefined && originalCols[0] !== 0) {
-                const cols = particlesGeometry.attributes.color.array;
-                for(let i=0; i<particlesCount*3; i++) cols[i] = originalCols[i];
-                particlesGeometry.attributes.color.needsUpdate = true;
+
+            if (typeof hashGridGroup !== 'undefined' && hashGridGroup) {
+
+                hashGridGroup.visible = false;
+
+                hashGridGroup.children.forEach(c => {
+
+                    gsap.killTweensOf(c.position);
+
+                    if(c.material) gsap.killTweensOf(c.material);
+
+                });
+
             }
+
+            if (typeof entropyGroup !== 'undefined' && entropyGroup) {
+
+                entropyGroup.visible = false;
+
+                entropyGroup.children.forEach(c => {
+
+                    gsap.killTweensOf(c.position);
+
+                    if(c.material) gsap.killTweensOf(c.material);
+
+                });
+
+            }
+
+            
+
+            // Restore colors
+
+            if (typeof originalCols !== 'undefined' && originalCols[0] !== undefined && originalCols[0] !== 0) {
+
+                const cols = particlesGeometry.attributes.color.array;
+
+                for(let i=0; i<particlesCount*3; i++) cols[i] = originalCols[i];
+
+                particlesGeometry.attributes.color.needsUpdate = true;
+
+            }
+
         };
+
+
+
+        let hashGridGroup;
+
+        let hashGridBuilt = false;
+
+        let entropyGroup;
+
+        let entropyBuilt = false;
+
+
+
+        window.showInstantGrid = function() {
+
+            if(window.hideVoxelsAndAnchors) window.hideVoxelsAndAnchors();
+
+            
+
+            // Match page 26 (anchorFeature) layout: model half-visible on left, upper face at center-left
+
+            gsap.killTweensOf(faceGroup.position);
+
+            gsap.killTweensOf(faceGroup.scale);
+
+            gsap.to(faceGroup.position, { x: -35, y: -5, duration: 1.5, ease: "power2.inOut" });
+
+            gsap.to(faceGroup.scale, { x: 3.5, y: 3.5, z: 3.5, duration: 1.5, ease: "power2.inOut" });
+
+            window.isAutoRotating = true;
+
+
+
+            // Restore original colors (not gray) and fix light mode multiplier
+
+            const cols = particlesGeometry.attributes.color.array;
+
+            for(let i=0; i<particlesCount*3; i++) {
+
+                cols[i] = originalCols[i];
+
+            }
+
+            particlesGeometry.attributes.color.needsUpdate = true;
+
+            material.color.setHex(0xffffff);
+
+            material.needsUpdate = true;
+
+
+
+            if(entropyGroup) entropyGroup.visible = false;
+
+
+
+            // Build hash grid objects ONCE
+
+            if (!hashGridBuilt) {
+
+                hashGridGroup = new THREE.Group();
+
+                scene.add(hashGridGroup);
+
+
+
+                // Wireframe container box (taller: height 60 instead of 22)
+
+                const boxGeo = new THREE.BoxGeometry(14, 60, 6);
+
+                const boxEdges = new THREE.EdgesGeometry(boxGeo);
+
+                const boxLine = new THREE.LineSegments(boxEdges, 
+
+                    new THREE.LineBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.35 }));
+
+                hashGridGroup.add(boxLine);
+
+
+
+                // Pre-build 120 colored cubes (3x more than 40)
+
+                const cubeGeo = new THREE.BoxGeometry(1.6, 1.6, 1.6);
+
+                for(let i = 0; i < 120; i++) {
+
+                    let r = 0.5, g = 0.5, b = 0.5;
+
+                    if (originalCols && originalCols.length > 0) {
+
+                        const ri = Math.floor(Math.random() * (originalCols.length / 3)) * 3;
+
+                        r = originalCols[ri]; g = originalCols[ri+1]; b = originalCols[ri+2];
+
+                    }
+
+                    const mat = new THREE.MeshBasicMaterial({ color: new THREE.Color(r, g, b), transparent: true, opacity: 0 });
+
+                    const cube = new THREE.Mesh(cubeGeo, mat);
+
+
+
+                    // Grid slot: 4 cols × 15 rows × 2 depth
+
+                    const col = (i % 4) - 1.5;
+
+                    const dep = Math.floor((i % 8) / 4) - 0.5;
+
+                    const row = Math.floor(i / 8) - 7;
+
+
+
+                    cube.userData.startPos = new THREE.Vector3(
+
+                        -35 + (Math.random()-0.5)*12,
+
+                        (Math.random()-0.5)*12,
+
+                        (Math.random()-0.5)*12
+
+                    );
+
+                    cube.userData.targetPos = new THREE.Vector3(col * 3, row * 3.8, dep * 2.5);
+
+                    cube.position.copy(cube.userData.startPos);
+
+                    hashGridGroup.add(cube);
+
+                }
+
+                hashGridBuilt = true;
+
+            }
+
+
+
+            hashGridGroup.visible = true;
+
+            hashGridGroup.position.set(-5, 0, 0);
+
+
+
+            // Animate cubes flying in and stacking
+
+            hashGridGroup.children.forEach((child, i) => {
+
+                if (i === 0) return; // skip wireframe box
+
+                gsap.killTweensOf(child.position);
+
+                gsap.killTweensOf(child.material);
+
+                child.position.copy(child.userData.startPos);
+
+                child.material.opacity = 0;
+
+                gsap.to(child.material, { opacity: 1, duration: 0.4, delay: i * 0.03 });
+
+                gsap.to(child.position, {
+
+                    x: child.userData.targetPos.x,
+
+                    y: child.userData.targetPos.y,
+
+                    z: child.userData.targetPos.z,
+
+                    duration: 1.0, ease: "power2.inOut", delay: i * 0.03
+
+                });
+
+            });
+
+        };
+
+
+
+        window.showEntropyCoding = function() {
+
+            if (!isAnchorsGenerated) {
+
+                window.showAnchors();
+
+            }
+
+
+
+            window.isAutoRotating = false;
+
+            let currentY = autoRotY % (Math.PI * 2);
+
+            if (currentY > Math.PI) currentY -= Math.PI * 2;
+
+            if (currentY < -Math.PI) currentY += Math.PI * 2;
+
+            faceGroup.rotation.y = currentY;
+
+            gsap.to(faceGroup.rotation, { y: 0, duration: 1.5, ease: "power2.out" });
+
+            autoRotY = 0;
+
+            
+
+            // Find rightmost anchor
+
+            let targetAnchorIdx = 0;
+
+            let maxX = -Infinity;
+
+            anchorsGroup.children.forEach((c, i) => {
+
+                if (c.position.x > maxX) {
+
+                    maxX = c.position.x;
+
+                    targetAnchorIdx = i;
+
+                }
+
+            });
+
+
+
+            if(anchorsGroup.children[targetAnchorIdx]) {
+
+                let targetPos = anchorsGroup.children[targetAnchorIdx].position;
+
+                let s = 3.5;
+
+                
+
+                // Move faceGroup so targetPos is slightly left of center (matching page 26)
+
+                gsap.killTweensOf(faceGroup.position);
+
+                gsap.killTweensOf(faceGroup.scale);
+
+                gsap.to(faceGroup.position, { 
+
+                    x: -targetPos.x * s - 20, 
+
+                    y: -targetPos.y * s, 
+
+                    duration: 1.5, ease: "power2.inOut" 
+
+                });
+
+                gsap.to(faceGroup.scale, { x: s, y: s, z: s, duration: 1.5, ease: "power2.inOut" });
+
+                
+
+                // Optimize: Bulk kill tweens and set properties instantly to avoid CPU freeze
+
+                const voxelMats = voxelsGroup.children.map(c => c.material);
+
+                gsap.killTweensOf(voxelMats);
+
+                voxelMats.forEach(mat => {
+
+                    mat.opacity = 0.15;
+
+                    mat.color.setHex(0x4488aa);
+
+                });
+
+
+
+                const anchorMats = anchorsGroup.children.map(c => c.material);
+
+                const anchorScales = anchorsGroup.children.map(c => c.scale);
+
+                gsap.killTweensOf(anchorMats);
+
+                gsap.killTweensOf(anchorScales);
+
+                anchorsGroup.children.forEach(child => {
+
+                    child.material.opacity = 0.15;
+
+                    child.material.color.setHex(0xdd5555);
+
+                    child.scale.set(1, 1, 1);
+
+                });
+
+            }
+
+
+
+            // Restore original colors and fix light mode multiplier
+
+            const cols = particlesGeometry.attributes.color.array;
+
+            for(let i=0; i<particlesCount*3; i++) {
+
+                cols[i] = originalCols[i];
+
+            }
+
+            particlesGeometry.attributes.color.needsUpdate = true;
+
+            material.color.setHex(0xffffff);
+
+            material.needsUpdate = true;
+
+
+
+            if(hashGridGroup) hashGridGroup.visible = false;
+
+
+
+            // Build entropy labels ONCE
+
+            if (!entropyBuilt) {
+
+                entropyGroup = new THREE.Group();
+
+                scene.add(entropyGroup);
+
+
+
+                // Create 6 dummy voxels (cyan wireframes exactly like real voxels)
+
+                const dummyVoxelSize = 4.5;
+
+                const dummyVoxelGeo = new THREE.BoxGeometry(dummyVoxelSize, dummyVoxelSize, dummyVoxelSize);
+
+                const dummyVoxelEdges = new THREE.EdgesGeometry(dummyVoxelGeo);
+
+                const dummyVoxelMat = new THREE.LineBasicMaterial({ color: 0x00ffff, transparent: true, opacity: 0 });
+
+                for(let rowIdx=0; rowIdx<6; rowIdx++) {
+
+                    const row = rowIdx - 2.5;
+
+                    const voxelLine = new THREE.LineSegments(dummyVoxelEdges, dummyVoxelMat.clone());
+
+                    // Voxel and Anchor share the same position: x = -16
+
+                    voxelLine.userData.targetPos = new THREE.Vector3(-16, row * 5.0, 0);
+
+                    voxelLine.userData.targetOpacity = 1.0; 
+
+                    voxelLine.position.set(0, 0, 0);
+
+                    entropyGroup.add(voxelLine);
+
+                }
+
+
+
+                // Create 6 dummy anchors (bright red)
+
+                const dummyAnchorGeo = new THREE.SphereGeometry(1.0, 16, 16);
+
+                const dummyAnchorMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+
+                for(let rowIdx=0; rowIdx<6; rowIdx++) {
+
+                    const row = rowIdx - 2.5;
+
+                    const anchorMesh = new THREE.Mesh(dummyAnchorGeo, dummyAnchorMat.clone());
+
+                    anchorMesh.userData.targetPos = new THREE.Vector3(-16, row * 5.0, 0);
+
+                    anchorMesh.userData.targetOpacity = 1.0;
+
+                    anchorMesh.position.set(0, 0, 0);
+
+                    anchorMesh.material.transparent = true;
+
+                    anchorMesh.material.opacity = 0;
+
+                    entropyGroup.add(anchorMesh);
+
+                }
+
+
+
+                // Create anchor labels with consistent symbol-to-code mapping and distinct colors
+
+                const labelData = [
+
+                    { char: "E", code: "10", color: "#00ff88", bg: "rgba(0,80,40,0.85)" },
+
+                    { char: "Z", code: "01101", color: "#ffaa00", bg: "rgba(80,50,0,0.85)" },
+
+                    { char: "A", code: "010", color: "#00ccff", bg: "rgba(0,60,80,0.85)" },
+
+                    { char: "?", code: "Hint", color: "#ff88ff", bg: "rgba(80,0,80,0.85)" },
+
+                    { char: "T", code: "1100101", color: "#ff4444", bg: "rgba(80,0,0,0.85)" },
+
+                    { char: "E", code: "10", color: "#00ff88", bg: "rgba(0,80,40,0.85)" },
+
+                    { char: "E", code: "10", color: "#00ff88", bg: "rgba(0,80,40,0.85)" },
+
+                    { char: "A", code: "010", color: "#00ccff", bg: "rgba(0,60,80,0.85)" },
+
+                    { char: "?", code: "Hint", color: "#ff88ff", bg: "rgba(80,0,80,0.85)" },
+
+                    { char: "Z", code: "01101", color: "#ffaa00", bg: "rgba(80,50,0,0.85)" },
+
+                    { char: "E", code: "10", color: "#00ff88", bg: "rgba(0,80,40,0.85)" },
+
+                    { char: "T", code: "1100101", color: "#ff4444", bg: "rgba(80,0,0,0.85)" }
+
+                ];
+
+
+
+                const spriteScale = 4.8; // slightly larger base scale
+
+                labelData.forEach((lb, i) => {
+
+                    const canvas = document.createElement("canvas");
+
+                    canvas.width = 280; canvas.height = 80;
+
+                    const ctx = canvas.getContext("2d");
+
+                    
+
+                    // Background pill
+
+                    ctx.fillStyle = lb.bg;
+
+                    ctx.beginPath();
+
+                    ctx.roundRect(0, 0, 280, 80, 12);
+
+                    ctx.fill();
+
+                    
+
+                    // Letter + code
+
+                    ctx.fillStyle = lb.color;
+
+                    ctx.font = "bold 36px monospace";
+
+                    ctx.fillText(lb.char + " ➡ " + lb.code, 12, 52);
+
+
+
+                    const tex = new THREE.CanvasTexture(canvas);
+
+                    const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0 });
+
+                    const sprite = new THREE.Sprite(spriteMat);
+
+                    
+
+                    // Arrange in 2 columns, 6 rows. Spread to avoid overlapping with voxel and each other.
+
+                    const colIdx = i % 2;
+
+                    const row = Math.floor(i / 2) - 2.5;
+
+                    const xPos = colIdx === 0 ? -5 : 11; // Box1 at -5, Box2 at 11
+
+                    
+
+                    sprite.userData.targetPos = new THREE.Vector3(xPos, row * 5.0, 0);
+
+                    sprite.userData.targetOpacity = 1.0;
+
+                    sprite.position.set(0, 0, 0);
+
+                    // Make boxes larger
+
+                    sprite.scale.set(spriteScale * 2.8, spriteScale * 0.9, 1);
+
+                    entropyGroup.add(sprite);
+
+                });
+
+                entropyBuilt = true;
+
+            }
+
+
+
+            entropyGroup.visible = true;
+
+            // Shift group much further left (to x=-12) to completely avoid text box on the right
+
+            entropyGroup.position.set(-12, 0, 0);
+
+
+
+            // Animate labels and dummy objects flying out
+
+            entropyGroup.children.forEach((child, i) => {
+
+                gsap.killTweensOf(child.position);
+
+                gsap.killTweensOf(child.material);
+
+                child.position.set(0, 0, 0);
+
+                child.material.opacity = 0;
+
+                gsap.to(child.material, { opacity: child.userData.targetOpacity, duration: 0.8, delay: i * 0.03 });
+
+                gsap.to(child.position, {
+
+                    x: child.userData.targetPos.x,
+
+                    y: child.userData.targetPos.y,
+
+                    z: child.userData.targetPos.z,
+
+                    duration: 1.2, ease: "power2.out", delay: i * 0.03
+
+                });
+
+            });
+
+        };
+
+
 
         window.set3DVisible = function(v) { if(typeof faceGroup !== 'undefined') faceGroup.visible = v; };
+
         window.setPointDensity = function(percent) {
+
             if(typeof particlesGeometry !== 'undefined' && typeof particlesCount !== 'undefined') {
+
                 const maxRender = 12000;
+
                 const count = Math.min(particlesCount, Math.floor((percent / 100) * maxRender));
+
                 particlesGeometry.setDrawRange(0, count);
+
             }
+
         };
+
         window.show2DImage = function(show) {
+
             gsap.to('#slide2-img', { opacity: show ? 1 : 0, duration: 0.5 });
+
         };
+
         window.scaleUp3D = function() {
-            gsap.to(faceGroup.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 0.8, ease: "power2.out" });
+
+            if (typeof faceGroup !== 'undefined') {
+
+                gsap.killTweensOf(faceGroup.scale);
+
+                gsap.killTweensOf(faceGroup.position);
+
+                gsap.to(faceGroup.scale, {x: 1.8, y: 1.8, z: 1.8, duration: 1});
+
+                gsap.to(faceGroup.position, {x: 0, y: 0, z: 0, duration: 1});
+
+            }
+
+            window.isAutoRotating = true;
+
+            if(window.setPointDensity) window.setPointDensity(100);
+
         };
+
+
+
         window.reset3DScale = function() {
-            gsap.to(faceGroup.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.6, ease: "power2.out" });
+
+            if (typeof faceGroup !== 'undefined') {
+
+                gsap.killTweensOf(faceGroup.scale);
+
+                gsap.killTweensOf(faceGroup.position);
+
+                gsap.to(faceGroup.scale, {x: 1, y: 1, z: 1, duration: 1});
+
+                gsap.to(faceGroup.position, {x: 0, y: 0, z: 0, duration: 1});
+
+            }
+
+            window.isAutoRotating = true;
+
+            // Restore light mode material color if needed
+
+            if (typeof material !== 'undefined') {
+
+                const isLight = document.body.classList.contains('light-mode');
+
+                material.color.setHex(isLight ? 0x4a4a4a : 0xffffff);
+
+                material.needsUpdate = true;
+
+            }
+
+            // Restore original vertex colors
+
+            if (typeof particlesGeometry !== 'undefined' && typeof originalCols !== 'undefined') {
+
+                const cols = particlesGeometry.attributes.color.array;
+
+                for(let i=0; i<particlesCount*3; i++) {
+
+                    cols[i] = originalCols[i];
+
+                }
+
+                particlesGeometry.attributes.color.needsUpdate = true;
+
+            }
+
         };
+
+
 
         const clock = new THREE.Clock();
+
         let targetRotationX = 0;
+
         let targetRotationY = 0;
+
         let autoRotY = 0;
 
+
+
         window.isAutoRotating = true;
+
         window.addEventListener('keydown', (e) => {
+
             if (e.code === 'Space') {
+
                 e.preventDefault();
+
                 window.isAutoRotating = !window.isAutoRotating;
+
                 
+
                 if (!window.isAutoRotating) {
+
                     let target = Math.round(faceGroup.rotation.y / (Math.PI * 2)) * (Math.PI * 2);
+
                     gsap.to(faceGroup.rotation, {
+
                         y: target,
+
                         duration: 1.5,
+
                         ease: "power2.out",
+
                         onUpdate: () => { autoRotY = faceGroup.rotation.y; }
+
                     });
+
                 } else {
+
                     gsap.killTweensOf(faceGroup.rotation);
+
                 }
+
             }
+
         });
+
+
 
         function animate() {
+
             requestAnimationFrame(animate);
+
             
+
             if (currentStep >= 2) {
+
                 if (window.isAutoRotating) {
+
                     autoRotY += 0.01;
+
                     faceGroup.rotation.y = autoRotY;
+
                 }
+
             }
+
             
+
             faceGroup.rotation.x = 0;
+
             
+
             if (faceGroup.visible) renderer.render(scene, camera);
+
         }
+
         animate();
 
+
+
         window.addEventListener('resize', () => {
+
             camera.aspect = window.innerWidth / window.innerHeight;
+
             camera.updateProjectionMatrix();
+
             renderer.setSize(window.innerWidth, window.innerHeight);
+
         });
+
         
+
         // Initialize
+
         document.getElementById('page-count').textContent = maxStep + 1;
+
+        
+
+        // Start in light mode by default
+
+        toggleTheme();
+
     
+
 </script>
+
 </body>
+
 </html>
+
